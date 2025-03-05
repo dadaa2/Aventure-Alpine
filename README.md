@@ -1,5 +1,8 @@
 # React + Vite
 
+Un site web nommée Aventure Alpine, une application web qui permettra de réserver des activités dans les montagnes comme le ski, la randonnée ou l'escalade.
+Réalisé avec React, TailWindCSS ainsi qu'avec une base de donnée en MySQL et ou PostgreSQL (BDD pas encore choisis)
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
