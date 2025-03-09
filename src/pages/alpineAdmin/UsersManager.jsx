@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchUsers } from '../../services/UsersService';
+import { fetchUsers } from '../../services/UsersServices';
 
 function UsersManager() {
   const [users, setUsers] = useState([]);
@@ -19,6 +19,9 @@ function UsersManager() {
 
   return (
     <>
+    <div>
+      Partie rechercher 
+    </div>
       <table className="table table-hover">
         <thead>
           <tr>
@@ -27,6 +30,7 @@ function UsersManager() {
             <th>LastName</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -37,6 +41,7 @@ function UsersManager() {
               <td>{user.lastName}</td>
               <td>{user.email}</td>
               <td>{user.role}</td>
+              <td>Modifier Supprimer</td>
             </tr>
           ))}
         </tbody>

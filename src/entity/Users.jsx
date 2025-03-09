@@ -1,5 +1,3 @@
-//temporaire
-
 class Users {
     constructor(
         id, 
