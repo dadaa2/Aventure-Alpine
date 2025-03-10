@@ -2,8 +2,9 @@
   "development": {
     "username": "root",
     "password": null,
-    "database": "database_development",
-    "host": "127.0.0.1",
+    "database": "aventure-alpine",
+    "host": "localhost",
+    "port": 80,
     "dialect": "mysql"
   },
   "test": {
