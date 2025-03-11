@@ -5,6 +5,11 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      mail: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false,
+      },
       pseudo: {
         type: DataTypes.STRING,
         unique: true,
@@ -16,27 +21,23 @@ module.exports = (sequelize, DataTypes) => {
       },
       firstName: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
       lastName: {
         type: DataTypes.STRING,
       },
       street: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
       zipCode: {
         type: DataTypes.INTEGER,
-        allowNull: false,
       },
       city: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
-      inscriptionDate: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
+      //inscriptionDate: {
+      //  type: DataTypes.DATE,
+      //  allowNull: false,
+      //},
     });
   
     return Users;

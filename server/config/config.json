@@ -1,10 +1,10 @@
 {
   "development": {
     "username": "root",
-    "password": null,
+    "password": "root",
     "database": "aventure-alpine",
     "host": "localhost",
-    "port": 80,
+    "port": 3306,
     "dialect": "mysql"
   },
   "test": {
