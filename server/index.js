@@ -13,4 +13,9 @@ db.sequelize.sync().then(() => {
   app.listen(3002, () => {
     console.log('Server is running on port 3002');
   });
-});
+  async () => {
+    //await sequelize.sync({ force: true });
+    console.log('All models were synchronized successfully.');
+  }
+
+}); 
