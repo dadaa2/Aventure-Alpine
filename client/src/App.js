@@ -1,25 +1,36 @@
-import logo from './logo.svg';
 import './App.css';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 function App() {
+
+  const [listOfUsers, setListOfUsers] = useState([]);
+
+  useEffect(() => { 
+    axios.get("http://localhost:3002/users").then((response) => {
+      setListOfUsers(response.data);
+      console.log(response.data);
+    });
+  }, []);
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {listOfUsers.map((value, key) => { 
+        return ( 
+          <ul>
+            <div className='post'> 
+              <div className='title'> { value.mail } </div>
+              <div className='mail'> { value.pseudo } </div>
+              <div className='mail'> { value.firstName } </div>
+              <div className='mail'> { value.lastName } </div>
+              <div className='mail'> { value.street } </div>
+              <div className='mail'> { value.zipCode } </div>
+              <div className='mail'> { value.city } </div>
+            </div> 
+          </ul>
+      )})}
     </div>
   );
 }
-
 export default App;

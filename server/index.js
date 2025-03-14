@@ -1,5 +1,8 @@
 const express = require('express'); // instance du serveur
 const app = express(); //cela permet de faire les requetes servers
+const cors = require('cors') // permet de faire des requetes entre serveurs
+
+app.use(cors());
 app.use(express.json());
 
 const db = require('./models'); 
@@ -13,9 +16,5 @@ db.sequelize.sync().then(() => {
   app.listen(3002, () => {
     console.log('Server is running on port 3002');
   });
-  async () => {
-    //await sequelize.sync({ force: true });
-    console.log('All models were synchronized successfully.');
-  }
-
+  
 }); 
