@@ -1,36 +1,30 @@
+/* Import de composant */
 import './App.css';
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { Routes, Route } from 'react-router-dom'
+
+/* Import de page */
+import Header from './pages/components/Header';
+import Home from './pages/Home';
+import PrestationsMain from './pages/PrestationsMain'
+import ArticlesMain from './pages/ArticlesMain'
+import UsersManager from './pages/alpinAdmin/UsersManager'
 
 function App() {
 
-  const [listOfUsers, setListOfUsers] = useState([]);
-
-  useEffect(() => { 
-    axios.get("http://localhost:3002/users").then((response) => {
-      setListOfUsers(response.data);
-      console.log(response.data);
-    });
-  }, []);
-
-
   return (
     <div className="App">
-      {listOfUsers.map((value, key) => { 
-        return ( 
-          <ul>
-            <div className='post'> 
-              <div className='title'> { value.mail } </div>
-              <div className='mail'> { value.pseudo } </div>
-              <div className='mail'> { value.firstName } </div>
-              <div className='mail'> { value.lastName } </div>
-              <div className='mail'> { value.street } </div>
-              <div className='mail'> { value.zipCode } </div>
-              <div className='mail'> { value.city } </div>
-            </div> 
-          </ul>
-      )})}
+      <Header />
+      <div className="container">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/prestations" element={<PrestationsMain />} />
+          <Route path="/articles" element={<ArticlesMain />} />
+          <Route path="/admin/users" element={<UsersManager />} />
+          <Route path="/admin/articles" element={<ArticlesMain />} />
+        </Routes>
+      </div>
     </div>
   );
 }
+
 export default App;

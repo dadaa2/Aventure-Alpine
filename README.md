@@ -9,6 +9,7 @@ Avec l'utilisattion des bibliothèques notables comme :
 - mysql2, elle permet de se connecter à la base de donnée qui est en MySQL
 - Faker, un générateur de données factices.
 - Axios, un outil qui permet de faire des requetes HTTP.
+- react-dom-router, elle permet de faire les liens entre différents pages.
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
