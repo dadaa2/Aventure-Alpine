@@ -3,7 +3,6 @@ const router = express.Router();
 const { Users } = require('../models')
 
 router.get('/', async (req, res) => {
-    //res.json('Hello World!');
     const listOfUsers = await  Users.findAll();
     res.json(listOfUsers);
 });

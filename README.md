@@ -3,7 +3,12 @@
 Un site web nommée Aventure Alpine, une application web qui permettra de réserver des activités dans les montagnes comme le ski, la randonnée ou l'escalade.
 Réalisé avec React, TailWindCSS ainsi qu'avec une base de donnée en MySQL et ou PostgreSQL (BDD pas encore choisis)
 
-
+Avec l'utilisattion des bibliothèques notables comme :
+- Sequelize, un ORM (Objet Relational Mapping) qui permet de lier la base de donnée au code facilement.
+- express, un outil qui gère les API facilement 
+- mysql2, elle permet de se connecter à la base de donnée qui est en MySQL
+- Faker, un générateur de données factices.
+- Axios, un outil qui permet de faire des requetes HTTP.
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
