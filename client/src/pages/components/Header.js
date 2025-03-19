@@ -21,39 +21,58 @@ function Header() {
             <Link to="/articles" className='nav-link'>Articles</Link>
           </li>
 
-          <li className="nav-item dropdown">
-            <a 
-              className='nav-link dropdown toggle' 
-              id="navbarDropdown" 
-              role="button" 
-              data-toggle="dropdown"
-              aria-haspopup="true" 
-              aria-expanded="false"
-              >
-              Administration
-            </a>
-            <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li className="dropdown-item">
-                 <Link to="/admin/users">Gestion utilisateurs</Link>
-              </li>
-              <li className="dropdown-item">
-                <Link to="/admin/articles">Gestion articles</Link>
-              </li>
+          <li className="nav-item">
+            <div className='dropdown'>
+              <a href="#" className='nav-link dropdown-toggle' 
+                id="adminDropdown" 
+                role="button" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false">
+                Administration
+              </a>
+              <ul className='dropdown-menu' aria-labelledby="adminDropdown">
+                <li>
+                   <Link to="/admin/users" className="dropdown-item">Gestion utilisateurs</Link>
+                </li>
+                <li>
+                  <Link to="/admin/articles" className="dropdown-item">Gestion articles</Link>
+                </li>
+              </ul>
             </div>
           </li>
 
-
-
-
-
           <li className="nav-item">
-            <Link to="/reservation" className='nav-link'> Mes réservation </Link>
-          </li>
-          <li className="nav-item"><Link to="/my-account">Mon compte</Link></li>
-            <li className="nav-item">Inscription</li>
-            <li className="nav-item">Connexion</li>
+            <div className='dropdown'>
+              <a href="#" className='nav-link dropdown-toggle' 
+                id="userDropdown" 
+                role="button" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false">
+                Mon compte
+              </a>
+              <ul className='dropdown-menu' aria-labelledby="userDropdown">
+                <li>
+                   <Link to="/user/profile" className="dropdown-item">Mon profil</Link>
+                </li>
+
+                <li>
+                   <Link to="/user/booking" className="dropdown-item">Mes réservations</Link>
+                </li>
+                <li><hr class="dropdown-divider"/>
+                </li>
+                <li>
+                   <Link to="/user/parameter" className="dropdown-item">Paramètre</Link>
+                </li>
+                <li>
+                  <Link to="/user/deconnection" className="dropdown-item">Déconnexion</Link>
+                </li>
+              </ul>
+            </div>
+          </li>         
+
+          
         </ul>
-      </nav>
+      </nav>  
     </div>
   )
 }

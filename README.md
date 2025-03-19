@@ -10,6 +10,8 @@ Avec l'utilisattion des bibliothèques notables comme :
 - Faker, un générateur de données factices.
 - Axios, un outil qui permet de faire des requetes HTTP.
 - react-dom-router, elle permet de faire les liens entre différents pages.
+- formil, pour la gestion automatiques des form
+- yup, pour vérifier la validation des entrés
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

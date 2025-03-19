@@ -1,8 +1,6 @@
 import React from 'react'
 
 function Home() {
-  console.log("Home component is rendered");
-
   return (
 
     <div>
