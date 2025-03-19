@@ -1,7 +1,18 @@
 # React + Vite
 
 Un site web nommée Aventure Alpine, une application web qui permettra de réserver des activités dans les montagnes comme le ski, la randonnée ou l'escalade.
-Réalisé avec React, TailWindCSS ainsi qu'avec une base de donnée en MySQL et ou PostgreSQL (BDD pas encore choisis)
+Réalisé avec React et Bootstrap ainsi qu'avec une base de donnée en MySQL.
+
+Faire npm start pour démarer l'application
+Avec la bibliothèque concurrently 
+Dans la console la partie bleu c'est le terminal du client, en rouge le terminal du serveur. 
+Sinon faire
+
+```bash
+npm start 
+```
+dans le dossier client et server.
+
 
 Avec l'utilisattion des bibliothèques notables comme :
 - Sequelize, un ORM (Objet Relational Mapping) qui permet de lier la base de donnée au code facilement.
