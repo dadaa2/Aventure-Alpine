@@ -14,7 +14,7 @@ npm start
 dans le dossier client et server.
 
 
-Avec l'utilisattion des bibliothèques notables comme :
+Avec l'utilisation des bibliothèques notables comme :
 - Sequelize, un ORM (Objet Relational Mapping) qui permet de lier la base de donnée au code facilement.
 - express, un outil qui gère les API facilement 
 - mysql2, elle permet de se connecter à la base de donnée qui est en MySQL
