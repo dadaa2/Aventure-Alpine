@@ -40,7 +40,6 @@ function Header() {
               </ul>
             </div>
           </li>
-
           <li className="nav-item">
             <div className='dropdown'>
               <a href="#" className='nav-link dropdown-toggle' 
