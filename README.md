@@ -1,4 +1,4 @@
-# React + Vite
+# Aventure Alpine en React
 
 Un site web nommée Aventure Alpine, une application web qui permettra de réserver des activités dans les montagnes comme le ski, la randonnée ou l'escalade.
 Réalisé avec React et Bootstrap ainsi qu'avec une base de donnée en MySQL.
