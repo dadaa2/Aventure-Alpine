@@ -26,9 +26,18 @@ router.post('/create', async (req, res) => {
     }
 });
 
-/* router.get("/:articleId", async (req, res) => {
-    const articleId = req.params.articleId;
-    const comments = await Comments.findAll({ where: { articleId: articleId } });
-    res.json(comments);
-  }); */
+router.get("/:constId", async (req, res) => {
+    try {
+        const constId = req.params.id;
+        const article = await Article.findByPk(constId);
+        res.json(article);
+    }
+    catch (error) {
+        console.error("Error getting article:", error);
+        res.status(500).json({ error: "An error occurred while getting the article." });
+    }
+  });
+
+
+
 module.exports = router;
