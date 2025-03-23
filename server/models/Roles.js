@@ -1,23 +1,19 @@
 module.exports = (sequelize, DataTypes) => {
-    const Article = sequelize.define('Article', {
+    const Roles = sequelize.define('Roles', {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      title: {
+      roleName: {
         type: DataTypes.STRING,
+        unique: true,
         allowNull: false,
       },
-      contentArticle: {
+      roleDescription: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
-      published: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-      }
     });
   
-    return Article;
+    return Roles;
   }

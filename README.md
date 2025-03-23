@@ -23,6 +23,7 @@ Avec l'utilisation des bibliothèques notables comme :
 - react-dom-router, elle permet de faire les liens entre différents pages.
 - formil, pour la gestion automatiques des form
 - yup, pour vérifier la validation des entrés
+- UUID, pour des id uniques et automatique
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

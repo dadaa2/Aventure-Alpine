@@ -5,11 +5,18 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      textCommentary: {
+      commentaryBody: {
         type: DataTypes.STRING,
         allowNull: false,
       },
     });
 
+    Commentary.associate = (models) => {
+      Commentary.belongsTo(models.Article, {
+        foreignKey: 'articleId',
+        as: 'article',
+        onDelete: 'CASCADE'
+      });
+    }
     return Commentary;
   }

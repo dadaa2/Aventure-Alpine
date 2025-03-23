@@ -14,7 +14,8 @@
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "mysql2": "^3.13.0",
-    "sequelize": "^6.37.6"
+    "sequelize": "^6.37.6",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "sequelize-cli": "^6.6.2"

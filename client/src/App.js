@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import PrestationsMain from './pages/PrestationsMain'
 import ArticlesMain from './pages/ArticlesMain'
 import UsersManager from './pages/alpinAdmin/UsersManager'
+import ArticlesManager from './pages/alpinAdmin/ArticlesManager'
 
 function App() {
 
@@ -20,7 +21,7 @@ function App() {
           <Route path="/prestations" element={<PrestationsMain />} />
           <Route path="/articles" element={<ArticlesMain />} />
           <Route path="/admin/users" element={<UsersManager />} />
-          <Route path="/admin/articles" element={<ArticlesMain />} />
+          <Route path="/admin/articles" element={<ArticlesManager />} />
         </Routes>
       </div>
     </div>

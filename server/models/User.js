@@ -1,14 +1,17 @@
 module.exports = (sequelize, DataTypes) => {
-    const Users = sequelize.define('Users', {
+    const User = sequelize.define('User', {
       id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV1,
         primaryKey: true,
-        autoIncrement: true,
       },
       mail: {
         type: DataTypes.STRING,
         unique: true,
         allowNull: false,
+        validate: {
+          isEmail: true,
+        }
       },
       pseudo: {
         type: DataTypes.STRING,
@@ -34,11 +37,21 @@ module.exports = (sequelize, DataTypes) => {
       city: {
         type: DataTypes.STRING,
       },
-      //inscriptionDate: {
-      //  type: DataTypes.DATE,
-      //  allowNull: false,
-      //},
     });
-  
-    return Users;
+    
+    User.associate = (models) => {
+      User.hasMany(models.Articles, {
+        onDelete: "cascade",
+        foreignKey: 'userId',
+        as: 'articles',
+      });
+    }
+    User.associate = (models) => {
+      User.hasMany(models.Commentary, {
+        onDelete: "cascade",
+        foreignKey: 'userId',
+        as: 'commentaries',
+      });
+    }
+    return User;
   }
