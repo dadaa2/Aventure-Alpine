@@ -1,3 +1,5 @@
+const sequelizeBcrypt = require('sequelize-bcrypt');
+
 module.exports = (sequelize, DataTypes) => {
     const User = sequelize.define('User', {
       id: {
@@ -44,6 +46,12 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 1, 
         // 1 = user, 2 = editor, 3 = admin, 
       },
+    });
+    
+    sequelizeBcrypt(User, {
+      fields: ['password'], // Champ à hasher
+      rounds: 10, // Nombre de rounds pour le sel (équivalent à genSalt(10))
+      // La fonction compare sera automatiquement ajoutée comme "comparePassword"
     });
     
     User.associate = (models) => {
