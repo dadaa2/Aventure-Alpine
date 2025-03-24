@@ -26,26 +26,56 @@ const initializeDatabase = async () => {
     console.log('🔄 Starting synchronization with the database...');
     // force = true, allows deleting existing tables and recreating them
     // alter = true, allows modifying tables
+    // SET FOREIGN_KEY_CHECKS = 0; allows to disable foreign key checks when recreating tables
+    await db.sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
     await db.sequelize.sync({ force: true });
-    console.log('✅ Tables created successfully');
+    await db.sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
+    console.log('🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵✅ Tables created successfully🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵🔵');
     
     // Check if seeders need to be executed
     console.log('🔍 Checking existing data...');
+
+    // Vérifier si les tables existent et sont remplies
     try {
-      const roleCount = await db.Role.count();
+      // Vérifier si la table Roles existe et contient des données
+      const roleCount = await db.sequelize.query(
+        "SELECT COUNT(*) as count FROM Roles;",
+        { type: db.sequelize.QueryTypes.SELECT }
+      ).then(result => result[0].count);
+      
       console.log(`   Roles found: ${roleCount}`);
       
       if (roleCount === 0) {
-      console.log('   No roles found, executing seeders');
-      await runSeeders();
+        console.log('   No roles found, executing seeders\n');
+        try {
+          const result = await runSeeders();
+          console.log(`✅ Seeders executed successfully (Total time: ${result.totalTimeMs}ms)`);
+        } catch (seedError) {
+          console.error('❌ Error during seeding:', seedError.message);
+          // Arrêter l'application si les seeders échouent
+          process.exit(1);
+        }
       } else {
-      console.log('   Roles found, seeders not needed');
+        console.log('   Roles found, seeders not needed');
       }
     } catch (error) {
-      console.error('❌ Error checking roles:', error.message);
-      // If the Role table does not exist yet despite synchronization
-      console.log('   Trying even with error...');
-      await runSeeders();
+      // Si l'erreur est de type "table doesn't exist", c'est normal après un sync force
+      if (error.message.includes("doesn't exist") || error.message.includes("no such table")) {
+        console.log('   Tables not found (normal after force sync), executing seeders');
+        try {
+          const result = await runSeeders();
+          console.log(`✅ Seeders executed successfully (Total time: ${result.totalTimeMs}ms)`);
+        } catch (seedError) {
+          console.error('❌ Error during seeding:', seedError.message);
+          console.error('   Details:', seedError);
+          // Arrêter l'application si les seeders échouent
+          process.exit(1);
+        }
+      } else {
+        // Autre type d'erreur (connexion, etc.)
+        console.error('❌ Database error:', error.message);
+        process.exit(1);
+      }
     }
     
     // Start the server

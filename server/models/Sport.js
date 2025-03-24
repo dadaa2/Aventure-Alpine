@@ -10,21 +10,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
     });
+    
     Sport.associate = (models) => {
-      Sport.hasMany(models.Ski, {
+      Sport.hasMany(models.Prestation, {
         onDelete: "CASCADE",
         foreignKey: 'sportId',
-        as: 'skis',
-      });
-      Sport.hasMany(models.Escalade, {
-        onDelete: "CASCADE",
-        foreignKey: 'sportId',
-        as: 'escalades',
-      });
-      Sport.hasMany(models.Randonnee, {
-        onDelete: "CASCADE",
-        foreignKey: 'sportId',
-        as: 'randonnees',
+        as: 'prestations',
       });
     }
   

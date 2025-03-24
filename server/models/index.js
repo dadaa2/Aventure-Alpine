@@ -13,7 +13,12 @@ let sequelize;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
+  sequelize = new Sequelize(config.database, config.username, config.password, {
+    ...config,
+    // Ajout de cette fonctionnalité pour débugger les requêtes SQL
+    logging: console.log, // Affiche toutes les requêtes SQL
+    benchmark: true, // Affiche le temps d'exécution
+  });
 }
 
 fs

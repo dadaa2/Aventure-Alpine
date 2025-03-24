@@ -1,27 +1,38 @@
 module.exports = (sequelize, DataTypes) => {
-    const Ski = sequelize.define('Ski', {
-      snowCondition: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      skiLift: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      pistColor: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      sportId: {
-        type: DataTypes.INTEGER,
-        references: { model: "Sports", key: "id" },
-        onDelete: "CASCADE",
-      },
+  const Ski = sequelize.define('Ski', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    snowCondition: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    skiLift: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    pistColor: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    prestationId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Prestations',
+        key: 'id'
+      }
+    }
+  });
+
+  Ski.associate = (models) => {
+    Ski.belongsTo(models.Prestation, {
+      foreignKey: 'prestationId',
+      as: 'prestation'
     });
+  }
 
-    Ski.associate = (models) => {
-      Ski.belongsTo(models.Sport, { foreignKey: "sportId", as: "sport" });
-    };
-
-    return Ski;
+  return Ski;
 };

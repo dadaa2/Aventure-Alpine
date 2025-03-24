@@ -1,27 +1,39 @@
 module.exports = (sequelize, DataTypes) => {
-    const Escalade = sequelize.define('Escalade', {
-      difficulty: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      ascentionTime: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      location: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      sportId: {
-        type: DataTypes.INTEGER,
-        references: { model: "Sports", key: "id" },
-        onDelete: "CASCADE",
-      },
+  const Escalade = sequelize.define('Escalade', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    difficulty: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    ascentionTime: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    prestationId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Prestations',
+        key: 'id'
+      }
+    }
+  });
+
+  Escalade.associate = (models) => {
+    // Une escalade appartient à une prestation
+    Escalade.belongsTo(models.Prestation, {
+      foreignKey: 'prestationId',
+      as: 'prestation'
     });
+  }
 
-    Escalade.associate = (models) => {
-      Escalade.belongsTo(models.Sport, { foreignKey: "sportId", as: "sport" });
-    };
-
-    return Escalade;
+  return Escalade;
 };
