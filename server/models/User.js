@@ -37,20 +37,34 @@ module.exports = (sequelize, DataTypes) => {
       city: {
         type: DataTypes.STRING,
       },
+      roleId: {
+        type: DataTypes.INTEGER,
+        references: { model: "Roles", key: "id" },
+        allowNull: false,
+        defaultValue: 1, 
+        // 1 = user, 2 = editor, 3 = admin, 
+      },
     });
     
     User.associate = (models) => {
-      User.hasMany(models.Articles, {
+      User.hasMany(models.Article, {
         onDelete: "cascade",
         foreignKey: 'userId',
         as: 'articles',
       });
-    }
-    User.associate = (models) => {
       User.hasMany(models.Commentary, {
         onDelete: "cascade",
         foreignKey: 'userId',
         as: 'commentaries',
+      });
+      User.hasMany(models.Book, {
+        onDelete: "cascade",
+        foreignKey: 'userId',
+        as: 'bookings',
+      });
+      User.belongsTo(models.Role, {
+        foreignKey: 'roleId',
+        as: 'role',
       });
     }
     return User;

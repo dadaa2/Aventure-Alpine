@@ -22,13 +22,14 @@ app.use("/articles", articlesRouter);
 
 
 
-//Lance le serveur sur port 3002, crée une instance de sequelize et synchronise la base de données
+//Lance le servur sur port 3002, crée une instance de sequelize et synchronise la base de données
 
 db.sequelize.sync(
-  { force: true }
+  { alter: true } // Met à jour les tables sans supprimer les données
     ).then(() => {  
-  app.listen(3002, () => {
-    console.log('Server is running on port 3002 and database is synchronized'); 
-  });
-  
-}); 
+      app.listen(3002, () => {
+        console.log('Server is running on port 3002 and database is synchronized'); 
+      });
+    }).catch((error) => {
+      console.error('Error synchronizing database:', error);
+});

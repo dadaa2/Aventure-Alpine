@@ -7,7 +7,6 @@ module.exports = (sequelize, DataTypes) => {
       },
       price: {
         type: DataTypes.DECIMAL(10,2),
-        unique: true,
         allowNull: false,
       },
       name: {
@@ -18,8 +17,24 @@ module.exports = (sequelize, DataTypes) => {
       description: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      sportId: {
+        type: DataTypes.INTEGER,
+        references: { model: "Sports", key: "id" },
+        allowNull: false,
       }
     });
-  
+    
+    Prestation.associate = (models) => {
+      Prestation.belongsTo(models.Sport, {
+        foreignKey: 'sportId',
+        as: 'sport',
+      });
+      Prestation.hasMany(models.Book, {
+        onDelete: "cascade",
+        foreignKey: 'prestationId',
+        as: 'bookings',
+      });
+    }
     return Prestation;
   }

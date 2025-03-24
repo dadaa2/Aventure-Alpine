@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      mainPicture   : {
+      mainPicture: {
         type: DataTypes.STRING(512)
       },
       contentArticle: {
@@ -19,6 +19,11 @@ module.exports = (sequelize, DataTypes) => {
       published: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
+      },
+      userId: {
+        type: DataTypes.UUID,
+        references: { model: "Users", key: "id" },
+        allowNull: false,
       }
     });
   
@@ -27,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "cascade",
         foreignKey: 'articleId',
         as: 'commentaries',
+      });
+      Article.belongsTo(models.User, {
+        foreignKey: 'userId',
+        as: 'author',
       });
     }
     return Article;
