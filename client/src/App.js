@@ -10,6 +10,7 @@ import ArticlesMain from './pages/ArticlesMain'
 
 import UsersManager from './pages/alpinAdmin/UsersManager'
 import ArticlesManager from './pages/alpinAdmin/ArticlesManager'
+import PrestationsManager from './pages/alpinAdmin/PrestationsManager'
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
           <Route path="/articles" element={<ArticlesMain />} />
           <Route path="/admin/users" element={<UsersManager />} />
           <Route path="/admin/articles" element={<ArticlesManager />} />
+          <Route path="/admin/prestations" element={<PrestationsManager />} />
         </Routes>
       </div>
     </div>
