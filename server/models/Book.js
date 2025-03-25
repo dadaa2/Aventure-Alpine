@@ -6,11 +6,11 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
       },
       startPrestation: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: false,
       },
       endPrestation: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: false,
       },
       numberPerson: {
