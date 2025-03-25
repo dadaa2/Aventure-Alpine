@@ -19,11 +19,24 @@ class PrestationController {
 
   // Récupérer une prestation par ID
   static async getPrestationById(id) {
+    console.log(`Tentative de récupération de la prestation avec ID: ${id}`);
     try {
       const response = await axios.get(`${API_URL}/${id}`);
+      console.log('Réponse reçue:', response);
+      console.log('Données de la prestation:', response.data);
       return response.data;
     } catch (error) {
-      console.error(`Error fetching prestation with id ${id}:`, error);
+      console.error(`Erreur lors de la récupération de la prestation ${id}:`);
+      if (error.response) {
+        console.error('Données de réponse:', error.response.data);
+        console.error('Statut:', error.response.status);
+        console.error('Headers:', error.response.headers);
+      } else if (error.request) {
+        console.error('Requête sans réponse:', error.request);
+      } else {
+        console.error('Erreur:', error.message);
+      }
+      console.error('Configuration:', error.config);
       throw error;
     }
   }
@@ -63,11 +76,17 @@ class PrestationController {
 
   // Récupérer toutes les catégories
   static async getAllCategories() {
+    console.log('Tentative de récupération des catégories');
     try {
       const response = await axios.get('http://localhost:3002/categories');
+      console.log('Catégories récupérées:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error('Erreur lors de la récupération des catégories:');
+      if (error.response) {
+        console.error('Données de réponse:', error.response.data);
+        console.error('Statut:', error.response.status);
+      }
       throw error;
     }
   }

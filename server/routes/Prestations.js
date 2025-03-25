@@ -55,42 +55,52 @@ router.get('/', async (req, res) => {
 });
 
 // Modifier la route GET pour récupérer une prestation par ID
+// Route GET pour récupérer une prestation par ID
 router.get('/:id', async (req, res) => {
   try {
-    const { id } = req.params;
-    
-    // Récupérer la prestation avec son sport associé
-    const prestation = await Prestation.findByPk(id, {
-      include: [
-        { 
-          model: Sport,
-          as: 'sport',  // Ajout de l'alias 'sport'
-          attributes: ['id', 'name']
-        }
-      ]
+    const prestation = await Prestation.findByPk(req.params.id, {
+      include: [{ model: Sport, as: 'sport' }]
     });
-    
+
     if (!prestation) {
       return res.status(404).json({ error: "Prestation not found" });
     }
+
+    // Convertir en objet JS pour pouvoir ajouter des propriétés
+    const prestationData = prestation.toJSON();
     
-    // Récupérer les détails spécifiques au sport
-    let sportDetails = null;
-    const sportType = prestation.sport.name.toLowerCase();
-    
-    if (sportType === 'ski') {
-      sportDetails = await db.Ski.findOne({ where: { prestationId: prestation.id } });
-    } else if (sportType === 'randonnée') {
-      sportDetails = await db.Randonnee.findOne({ where: { prestationId: prestation.id } });
-    } else if (sportType === 'escalade') {
-      sportDetails = await db.Escalade.findOne({ where: { prestationId: prestation.id } });
+    // Ajouter une vérification que sport existe et a un nom
+    if (!prestationData.sport) {
+      prestationData.sportDetails = null;
+      return res.status(200).json(prestationData);
     }
     
-    // Ajouter les détails du sport à la réponse
-    const result = prestation.toJSON();
-    result.sportDetails = sportDetails;
+    const sportType = prestationData.sport.name.toLowerCase();
     
-    res.status(200).json(result);
+    // Ajouter des logs pour le débogage
+    console.log('Sport type:', sportType);
+    
+    // Normalisation du nom du sport (suppression des accents)
+    const normalizedSportType = sportType
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+      
+    console.log('Sport type normalisé:', normalizedSportType);
+    console.log('Modèles disponibles:', Object.keys(db));
+
+    // Récupération des détails du sport en fonction de son type
+    let sportDetails = null;
+    if (normalizedSportType === 'ski' && db.Ski) {
+      sportDetails = await db.Ski.findOne({ where: { prestationId: prestationData.id } });
+    } else if ((normalizedSportType === 'randonnee' || normalizedSportType === 'randonne') && db.Randonne) {
+      // Utiliser le bon nom de modèle (Randonne au lieu de Randonnee)
+      sportDetails = await db.Randonne.findOne({ where: { prestationId: prestationData.id } });
+    } else if (normalizedSportType === 'escalade' && db.Escalade) {
+      sportDetails = await db.Escalade.findOne({ where: { prestationId: prestationData.id } });
+    }
+    
+    prestationData.sportDetails = sportDetails;
+    res.status(200).json(prestationData);
   } catch (error) {
     console.error("Error fetching prestation:", error);
     res.status(500).json({ error: "An error occurred while fetching the prestation." });

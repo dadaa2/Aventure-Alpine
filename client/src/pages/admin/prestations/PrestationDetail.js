@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faArrowLeft, faCalendarAlt, faMapMarkerAlt, faTag, faEuroSign, faInfo } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faArrowLeft, faTag, faEuroSign, faInfo } from '@fortawesome/free-solid-svg-icons';
 import PrestationController from '../../../controllers/PrestationController';
 
 function PrestationDetail() {
