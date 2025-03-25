@@ -2,12 +2,29 @@ const express = require('express');
 const router = express.Router();
 const { User } = require('../models');
 const bcrypt = require('bcrypt');
+const { Op } = require('sequelize');
 
-// Récupérer tous les utilisateurs avec pagination
+// Modification de la route GET pour ajouter la fonctionnalité de recherche
 router.get('/', async (req, res) => {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, search = '' } = req.query;
     try {
+        let whereClause = {};
+        
+        // Si un terme de recherche est fourni, créer une clause de recherche
+        if (search) {
+            whereClause = {
+                [Op.or]: [
+                    { pseudo: { [Op.like]: `%${search}%` } },
+                    { mail: { [Op.like]: `%${search}%` } },
+                    { firstName: { [Op.like]: `%${search}%` } },
+                    { lastName: { [Op.like]: `%${search}%` } },
+                    { city: { [Op.like]: `%${search}%` } }
+                ]
+            };
+        }
+        
         const users = await User.findAndCountAll({
+            where: whereClause,
             limit: parseInt(limit),
             offset: (page - 1) * limit,
         });

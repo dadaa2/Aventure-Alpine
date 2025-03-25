@@ -6,21 +6,21 @@ module.exports = {
     await queryInterface.bulkInsert('Roles', [
       {
         id: 1,
-        roleName: 'user',
+        roleName: 'User',
         roleDescription: 'Regular user with basic privileges',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         id: 2,
-        roleName: 'editor',
+        roleName: 'Editor',
         roleDescription: 'Can create and edit content',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         id: 3,
-        roleName: 'admin',
+        roleName: 'Admin',
         roleDescription: 'Has full access to all features',
         createdAt: new Date(),
         updatedAt: new Date()
@@ -38,11 +38,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    /**
-     * Add commands to revert seed here.
-     *
-     * Example:
-     * await queryInterface.bulkDelete('People', null, {});
-     */
+
   }
 };
