@@ -1,20 +1,74 @@
 const express = require('express');
 const router = express.Router();
 const { Book, User, Prestation } = require('../models');
+const { Op } = require('sequelize');
 
 // Récupérer toutes les réservations avec pagination
+// Récupérer toutes les réservations avec pagination
 router.get('/', async (req, res) => {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, search = '' } = req.query;
     try {
-        const bookings = await Book.findAndCountAll({
+        // Ce tableau stockera toutes les conditions de recherche
+        const searchConditions = [];
+        
+        // Si search est fourni, ajouter les conditions de recherche
+        if (search) {
+            // Recherche sur les ID de réservation
+            searchConditions.push({ id: { [Op.like]: `%${search}%` } });
+
+        }
+        
+        // Options pour la requête findAndCountAll
+        const options = {
             limit: parseInt(limit),
-            offset: (page - 1) * limit,
+            offset: (page - 1) * parseInt(limit),
             include: [
-                { model: User, as: 'user', attributes: ['id', 'mail', 'pseudo', 'firstName', 'lastName'] },
-                { model: Prestation, as: 'prestation' }
+                { 
+                    model: User, 
+                    as: 'user', 
+                    attributes: ['id', 'mail', 'pseudo', 'firstName', 'lastName'],
+                    // Recherche sur l'utilisateur si search est fourni
+                    ...(search ? {
+                        where: {
+                            [Op.or]: [
+                                { firstName: { [Op.like]: `%${search}%` } },
+                                { lastName: { [Op.like]: `%${search}%` } },
+                                { mail: { [Op.like]: `%${search}%` } }
+                            ]
+                        },
+                        required: false // Rend la jointure externe (LEFT JOIN)
+                    } : {})
+                },
+                { 
+                    model: Prestation, 
+                    as: 'prestation',
+                    // Recherche sur la prestation si search est fourni
+                    ...(search ? {
+                        where: {
+                            [Op.or]: [
+                                { name: { [Op.like]: `%${search}%` } },
+                                { description: { [Op.like]: `%${search}%` } }
+                            ]
+                        },
+                        required: false // Rend la jointure externe (LEFT JOIN)
+                    } : {})
+                }
             ],
-            order: [['createdAt', 'DESC']]
-        });
+            where: search ? {
+                [Op.or]: [
+                    ...searchConditions,
+                    { '$user.firstName$': { [Op.like]: `%${search}%` } },
+                    { '$user.lastName$': { [Op.like]: `%${search}%` } },
+                    { '$user.mail$': { [Op.like]: `%${search}%` } },
+                    { '$prestation.name$': { [Op.like]: `%${search}%` } },
+                    { '$prestation.description$': { [Op.like]: `%${search}%` } }
+                ]
+            } : {},
+            order: [['createdAt', 'DESC']],
+            distinct: true
+        };
+        
+        const bookings = await Book.findAndCountAll(options);
         res.json(bookings);
     } catch (error) {
         console.error("Error getting bookings:", error);

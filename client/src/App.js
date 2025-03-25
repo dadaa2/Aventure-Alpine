@@ -33,9 +33,12 @@ import AdminPrestationCreate from './pages/admin/prestations/PrestationCreate';
 import AdminPrestationEdit from './pages/admin/prestations/PrestationEdit';
 import AdminPrestationDetail from './pages/admin/prestations/PrestationDetail';
 
-
 import AdminArticles from './pages/admin/articles/ArticlesManager';
+
 import AdminBookings from './pages/admin/bookings/BookingsManager';
+import AdminBookingDetail from './pages/admin/bookings/BookingDetail';
+import AdminBookingCreate from './pages/admin/bookings/BookingCreate';
+import AdminBookingEdit from './pages/admin/bookings/BookingEdit';
 
 function App() {
 
@@ -81,8 +84,10 @@ function App() {
           <Route path="/admin/prestations/edit/:id" element={<AdminPrestationEdit />} />
           <Route path="/admin/prestations/:id" element={<AdminPrestationDetail />} />
 
-          <Route path="/admin/articles" element={<AdminArticles />} />
           <Route path="/admin/bookings" element={<AdminBookings />} />
+          <Route path="/admin/bookings/create" element={<AdminBookingCreate />} />
+          <Route path="/admin/bookings/:id" element={<AdminBookingDetail />} />
+          <Route path="/admin/bookings/:id/edit" element={<AdminBookingEdit />} />
         </Routes>
       </div>
       <Footer />

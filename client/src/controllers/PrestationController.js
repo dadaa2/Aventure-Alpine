@@ -3,8 +3,6 @@ import axios from 'axios';
 const BASE_URL = 'http://localhost:3002';
 const API_URL = `${BASE_URL}/prestations`;
 const CATEGORIES_URL = `${BASE_URL}/categories`;
-const BOOKS_URL = `${BASE_URL}/books`;
-const UPLOAD_URL = `${BASE_URL}/upload`;
 const SPORTS_URL = `${BASE_URL}/sports`;
 
 class PrestationController {

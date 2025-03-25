@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faArrowLeft, faUser, faEnvelope, faMapMarkerAlt, faIdCard, faShieldAlt } from '@fortawesome/free-solid-svg-icons';
 import UserController from '../../../controllers/UserController';
-import axios from 'axios';  // Nous gardons axios pour l'appel au rôle qui n'est pas encore dans le contrôleur
+import axios from 'axios';
 
 function UserDetail() {
   const { id } = useParams();
