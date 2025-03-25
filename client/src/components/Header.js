@@ -1,9 +1,8 @@
 /* Import de librairie */
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Header() {
-
   const navigate = useNavigate();
 
   // Fonction simplifiée pour naviguer
@@ -19,15 +18,16 @@ function Header() {
     
     // Utiliser navigate pour changer de page
     navigate(path);
-    
-    // Forcer un rafraîchissement de la page (solution brutale mais efficace)
-    // setTimeout(() => window.location.reload(), 0);
   };
 
   return (
     <div className='header'>
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container-fluid">
+          <Link to="/" className="navbar-brand">
+            <img src="/logo.png" alt="Aventure Alpine" height="40" />
+          </Link>
+          
           <button 
             className="navbar-toggler" 
             type="button" 
@@ -49,6 +49,7 @@ function Header() {
                 <Link to="/articles" className='nav-link' onClick={(e) => handleNavigation('/articles', e)}>Articles</Link>
               </li>
 
+              {/* Menu Admin - accessible à tous */}
               <li className="nav-item dropdown">
                 <a href="#" className='nav-link dropdown-toggle' 
                   id="adminDropdown" 
@@ -73,8 +74,15 @@ function Header() {
                       Gestion prestations
                     </Link>
                   </li>
+                  <li>
+                    <Link to="/admin/bookings" className="dropdown-item" onClick={(e) => handleNavigation('/admin/bookings', e)}>
+                      Gestion réservations
+                    </Link>
+                  </li>
                 </ul>
               </li>
+
+              {/* Menu utilisateur - accessible à tous */}
               <li className="nav-item dropdown">
                 <a href="#" className='nav-link dropdown-toggle' 
                   id="userDropdown" 
@@ -85,28 +93,34 @@ function Header() {
                 </a>
                 <ul className='dropdown-menu' aria-labelledby="userDropdown">
                   <li>
-                     <Link to="/user/profile" className="dropdown-item" onClick={(e) => handleNavigation('/user/profile', e)}>Mon profil</Link>
-                  </li>
-
-                  <li>
-                     <Link to="/user/booking" className="dropdown-item" onClick={(e) => handleNavigation('/user/booking', e)}>Mes réservations</Link>
-                  </li>
-                  <li><hr className="dropdown-divider"/>
+                    <Link to="/user/profile" className="dropdown-item" onClick={(e) => handleNavigation('/user/profile', e)}>
+                      Mon profil
+                    </Link>
                   </li>
                   <li>
-                     <Link to="/user/parameter" className="dropdown-item" onClick={(e) => handleNavigation('/user/parameter', e)}>Paramètre</Link>
+                    <Link to="/user/bookings" className="dropdown-item" onClick={(e) => handleNavigation('/user/bookings', e)}>
+                      Mes réservations
+                    </Link>
+                  </li>
+                  <li><hr className="dropdown-divider"/></li>
+                  <li>
+                    <Link to="/user/settings" className="dropdown-item" onClick={(e) => handleNavigation('/user/settings', e)}>
+                      Paramètres
+                    </Link>
                   </li>
                   <li>
-                    <Link to="/user/deconnection" className="dropdown-item" onClick={(e) => handleNavigation('/user/deconnection', e)}>Déconnexion</Link>
+                    <Link to="/login" className="dropdown-item" onClick={(e) => handleNavigation('/login', e)}>
+                      Connexion
+                    </Link>
                   </li>
                 </ul>
-              </li>         
+              </li>
             </ul>
           </div>
         </div>
       </nav>  
     </div>
-  )
+  );
 }
 
-export default Header
+export default Header;

@@ -9,12 +9,12 @@ import Home from './pages/Home';
 import PrestationsMain from './pages/PrestationsMain'
 import ArticlesMain from './pages/ArticlesMain'
 
-import UsersManager from './pages/alpinAdmin/UsersManager'
-import ArticlesManager from './pages/alpinAdmin/ArticlesManager'
+import UsersManager from './pages/OLDalpinAdmin/UsersManager'
+import ArticlesManager from './pages/OLDalpinAdmin/ArticlesManager'
 import PrestationDetail from './pages/PrestationDetail'
 
-import AdminPrestationDetail from './pages/alpinAdmin/AdminPrestationDetail'
-import PrestationsManager from './pages/alpinAdmin/PrestationsManager'
+import AdminPrestationDetail from './pages/OLDalpinAdmin/AdminPrestationDetail'
+import PrestationsManager from './pages/OLDalpinAdmin/PrestationsManager'
 import PrestationEdit from './pages/admin/PrestationEdit'
 import PrestationCreate from './pages/admin/PrestationCreate'
 

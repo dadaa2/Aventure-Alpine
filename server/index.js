@@ -20,6 +20,14 @@ app.use("/articles", articlesRouter);
 const prestationsRouter = require("./routes/Prestations");
 app.use("/prestations", prestationsRouter);
 
+// Router bookings
+const bookingsRouter = require("./routes/Bookings");
+app.use("/bookings", bookingsRouter);
+
+// Router roles
+const rolesRouter = require("./routes/Roles");
+app.use("/roles", rolesRouter);
+
 // Initialisation de la base de données avec étapes détaillées
 const initializeDatabase = async () => {
   try {
