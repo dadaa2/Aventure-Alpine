@@ -6,16 +6,22 @@ function Header() {
 
   const navigate = useNavigate();
 
-  // Fonction pour naviguer programmatiquement
-  const handleNavigation = (path) => {
-    // Ferme tous les menus déroulants Bootstrap avant la navigation
+  // Fonction simplifiée pour naviguer
+  const handleNavigation = (path, event) => {
+    // Empêcher la navigation par défaut du lien
+    if (event) event.preventDefault();
+    
+    // Fermer tous les dropdowns ouverts
     const dropdowns = document.querySelectorAll('.dropdown-menu.show');
     dropdowns.forEach(dropdown => {
       dropdown.classList.remove('show');
     });
     
-    // Navigation vers la page demandée
+    // Utiliser navigate pour changer de page
     navigate(path);
+    
+    // Forcer un rafraîchissement de la page (solution brutale mais efficace)
+    // setTimeout(() => window.location.reload(), 0);
   };
 
   return (
@@ -34,13 +40,13 @@ function Header() {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto">
               <li className="nav-item">
-                <Link to="/" className='nav-link' onClick={() => handleNavigation('/')}>Accueil</Link>  
+                <Link to="/" className='nav-link' onClick={(e) => handleNavigation('/', e)}>Accueil</Link>  
               </li>
               <li className="nav-item">
-                <Link to="/prestations" className='nav-link' onClick={() => handleNavigation('/prestations')}>Prestations</Link>
+                <Link to="/prestations" className='nav-link' onClick={(e) => handleNavigation('/prestations', e)}>Prestations</Link>
               </li>
               <li className="nav-item">
-                <Link to="/articles" className='nav-link' onClick={() => handleNavigation('/articles')}>Articles</Link>
+                <Link to="/articles" className='nav-link' onClick={(e) => handleNavigation('/articles', e)}>Articles</Link>
               </li>
 
               <li className="nav-item dropdown">
@@ -53,13 +59,19 @@ function Header() {
                 </a>
                 <ul className='dropdown-menu' aria-labelledby="adminDropdown">
                   <li>
-                    <Link to="/admin/users" className="dropdown-item" onClick={() => handleNavigation('/admin/users')}>Gestion utilisateurs</Link>
+                    <Link to="/admin/users" className="dropdown-item" onClick={(e) => handleNavigation('/admin/users', e)}>
+                      Gestion utilisateurs
+                    </Link>
                   </li>
                   <li>
-                    <Link to="/admin/articles" className="dropdown-item" onClick={() => handleNavigation('/admin/articles')}>Gestion articles</Link>
+                    <Link to="/admin/articles" className="dropdown-item" onClick={(e) => handleNavigation('/admin/articles', e)}>
+                      Gestion articles
+                    </Link>
                   </li>
                   <li>
-                    <Link to="/admin/prestations" className="dropdown-item" onClick={() => handleNavigation('/admin/prestations')}>Gestion prestations</Link>
+                    <Link to="/admin/prestations" className="dropdown-item" onClick={(e) => handleNavigation('/admin/prestations', e)}>
+                      Gestion prestations
+                    </Link>
                   </li>
                 </ul>
               </li>
@@ -73,19 +85,19 @@ function Header() {
                 </a>
                 <ul className='dropdown-menu' aria-labelledby="userDropdown">
                   <li>
-                     <Link to="/user/profile" className="dropdown-item" onClick={() => handleNavigation('/user/profile')}>Mon profil</Link>
+                     <Link to="/user/profile" className="dropdown-item" onClick={(e) => handleNavigation('/user/profile', e)}>Mon profil</Link>
                   </li>
 
                   <li>
-                     <Link to="/user/booking" className="dropdown-item" onClick={() => handleNavigation('/user/booking')}>Mes réservations</Link>
+                     <Link to="/user/booking" className="dropdown-item" onClick={(e) => handleNavigation('/user/booking', e)}>Mes réservations</Link>
                   </li>
                   <li><hr className="dropdown-divider"/>
                   </li>
                   <li>
-                     <Link to="/user/parameter" className="dropdown-item" onClick={() => handleNavigation('/user/parameter')}>Paramètre</Link>
+                     <Link to="/user/parameter" className="dropdown-item" onClick={(e) => handleNavigation('/user/parameter', e)}>Paramètre</Link>
                   </li>
                   <li>
-                    <Link to="/user/deconnection" className="dropdown-item" onClick={() => handleNavigation('/user/deconnection')}>Déconnexion</Link>
+                    <Link to="/user/deconnection" className="dropdown-item" onClick={(e) => handleNavigation('/user/deconnection', e)}>Déconnexion</Link>
                   </li>
                 </ul>
               </li>         

@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import PrestationForm from '../form/PrestationForm';
+import PrestationForm from '../../components/form/PrestationForm';
 
 function PrestationsCreate({ onPrestationCreated }) {
   const handleSubmit = async (formData) => {
