@@ -58,7 +58,7 @@ function Header() {
                   aria-expanded="false">
                   Administration
                 </a>
-                <ul className='dropdown-menu' aria-labelledby="adminDropdown">
+                <ul className='dropdown-menu dropdown-menu-right' aria-labelledby="adminDropdown">
                   <li>
                     <Link to="/admin/users" className="dropdown-item" onClick={(e) => handleNavigation('/admin/users', e)}>
                       Gestion utilisateurs
@@ -91,7 +91,7 @@ function Header() {
                   aria-expanded="false">
                   Mon compte
                 </a>
-                <ul className='dropdown-menu' aria-labelledby="userDropdown">
+                <ul className='dropdown-menu dropdown-menu-right' aria-labelledby="userDropdown">
                   <li>
                     <Link to="/user/profile" className="dropdown-item" onClick={(e) => handleNavigation('/user/profile', e)}>
                       Mon profil

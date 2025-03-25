@@ -1,27 +1,38 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../models');
-const { Prestation, Sport } = db;
+const { Prestation, Sport, Ski, Randonne, Escalade } = db;
 
-// Modifier également la route GET pour récupérer toutes les prestations
+// Vérifiez que les modèles sont correctement importés
+console.log("Modèles disponibles:", Object.keys(db));
+
+// Modifier la route GET pour récupérer toutes les prestations
 router.get('/', async (req, res) => {
   try {
     const prestations = await Prestation.findAll({
-      include: [{ model: Sport }]
+      include: [{ model: Sport, as: 'sport' }]
     });
     
     // Pour chaque prestation, récupérer les détails du sport
     const prestationsWithDetails = await Promise.all(prestations.map(async (prestation) => {
       const prestationData = prestation.toJSON();
-      const sportType = prestationData.Sport.name.toLowerCase();
       
+      // Vérifier que sport existe
+      if (!prestationData.sport) {
+        prestationData.sportDetails = null;
+        return prestationData;
+      }
+      
+      const sportType = prestationData.sport.name.toLowerCase();
       let sportDetails = null;
-      if (sportType === 'ski') {
-        sportDetails = await db.Ski.findOne({ where: { sportId: prestationData.sportId } });
-      } else if (sportType === 'randonnée') {
-        sportDetails = await db.Randonnee.findOne({ where: { sportId: prestationData.sportId } });
-      } else if (sportType === 'escalade') {
-        sportDetails = await db.Escalade.findOne({ where: { sportId: prestationData.sportId } });
+      
+      // Vérifier que les modèles existent avant de les utiliser
+      if (sportType === 'ski' && db.Ski) {
+        sportDetails = await db.Ski.findOne({ where: { prestationId: prestationData.id } });
+      } else if (sportType === 'randonnée' && db.Randonne) {
+        sportDetails = await db.Randonne.findOne({ where: { prestationId: prestationData.id } });
+      } else if (sportType === 'escalade' && db.Escalade) {
+        sportDetails = await db.Escalade.findOne({ where: { prestationId: prestationData.id } });
       }
       
       prestationData.sportDetails = sportDetails;
@@ -45,6 +56,7 @@ router.get('/:id', async (req, res) => {
       include: [
         { 
           model: Sport,
+          as: 'sport',  // Ajout de l'alias 'sport'
           attributes: ['id', 'name']
         }
       ]
@@ -56,14 +68,14 @@ router.get('/:id', async (req, res) => {
     
     // Récupérer les détails spécifiques au sport
     let sportDetails = null;
-    const sportType = prestation.Sport.name.toLowerCase();
+    const sportType = prestation.sport.name.toLowerCase();
     
     if (sportType === 'ski') {
-      sportDetails = await db.Ski.findOne({ where: { sportId: prestation.sportId } });
+      sportDetails = await db.Ski.findOne({ where: { prestationId: prestation.id } });
     } else if (sportType === 'randonnée') {
-      sportDetails = await db.Randonnee.findOne({ where: { sportId: prestation.sportId } });
+      sportDetails = await db.Randonnee.findOne({ where: { prestationId: prestation.id } });
     } else if (sportType === 'escalade') {
-      sportDetails = await db.Escalade.findOne({ where: { sportId: prestation.sportId } });
+      sportDetails = await db.Escalade.findOne({ where: { prestationId: prestation.id } });
     }
     
     // Ajouter les détails du sport à la réponse

@@ -70,6 +70,11 @@ function App() {
           <Route path="/admin/users/edit/:id" element={<AdminUserEdit />} />
           
           <Route path="/admin/prestations" element={<AdminPrestations />} />
+          
+
+
+
+          
           <Route path="/admin/articles" element={<AdminArticles />} />
           <Route path="/admin/bookings" element={<AdminBookings />} />
         </Routes>
