@@ -29,9 +29,9 @@ function PrestationDetail() {
   };
 
   const getSportDetailsContent = () => {
-    if (!prestation.sportDetails) return null;
+    if (!prestation.sportDetails || !prestation.sport) return null;
     
-    const sportType = prestation.Sport.name.toLowerCase();
+    const sportType = prestation.sport.name.toLowerCase();
     
     if (sportType === 'ski') {
       return (
@@ -154,16 +154,18 @@ function PrestationDetail() {
           <div className="row">
             <div className="col-md-8">
               <div className="d-flex mb-3 align-items-center">
-                <div className="me-3">
-                  <span className="badge bg-primary fs-5 p-2">
-                    <FontAwesomeIcon icon={faTag} className="me-2" />
-                    {prestation.Sport.name}
-                  </span>
-                </div>
+                {prestation.sport && (
+                  <div className="me-3">
+                    <span className="badge bg-primary fs-5 p-2">
+                      <FontAwesomeIcon icon={faTag} className="me-2" />
+                      {prestation.sport.name}
+                    </span>
+                  </div>
+                )}
                 <div>
                   <span className="badge bg-success fs-5 p-2">
                     <FontAwesomeIcon icon={faEuroSign} className="me-2" />
-                    {prestation.price.toFixed(2)} €
+                    {parseFloat(prestation.price).toFixed(2)} €
                   </span>
                 </div>
               </div>

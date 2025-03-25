@@ -356,9 +356,9 @@ function PrestationEdit() {
                     checked={formData.isActive}
                     onChange={handleChange}
                   />
-                  <label className="form-check-label" htmlFor="isActive">
+                  {/* <label className="form-check-label" htmlFor="isActive">
                     Prestation active
-                  </label>
+                  </label> */}
                 </div>
               </div>
             </div>

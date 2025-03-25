@@ -28,6 +28,22 @@ app.use("/bookings", bookingsRouter);
 const rolesRouter = require("./routes/Roles");
 app.use("/roles", rolesRouter);
 
+// Router sports
+const sportsRouter = require('./routes/Sports');
+app.use('/sports', sportsRouter);
+
+// Router skis
+const skisRouter = require('./routes/Skis');
+app.use('/skis', skisRouter);
+
+// Router randonnes
+const randonnesRouter = require('./routes/Randonnes');
+app.use('/randonnes', randonnesRouter);
+
+// Router escalades
+const escaladesRouter = require('./routes/Escalades');
+app.use('/escalades', escaladesRouter);
+
 // Initialisation de la base de données avec étapes détaillées
 const initializeDatabase = async () => {
   try {

@@ -22,11 +22,18 @@ import UserSettings from './pages/user/Settings';
 
 // Pages admin
 import AdminDashboard from './pages/admin/Dashboard';
+
 import AdminUsers from './pages/admin/users/UsersManager';
 import AdminUserDetail from './pages/admin/users/UserDetail';
 import AdminUserCreate from './pages/admin/users/UserCreate';
 import AdminUserEdit from './pages/admin/users/UserEdit';
+
 import AdminPrestations from './pages/admin/prestations/PrestationsManager';
+import AdminPrestationCreate from './pages/admin/prestations/PrestationCreate';
+import AdminPrestationEdit from './pages/admin/prestations/PrestationEdit';
+import AdminPrestationDetail from './pages/admin/prestations/PrestationDetail';
+
+
 import AdminArticles from './pages/admin/articles/ArticlesManager';
 import AdminBookings from './pages/admin/bookings/BookingsManager';
 
@@ -70,11 +77,10 @@ function App() {
           <Route path="/admin/users/edit/:id" element={<AdminUserEdit />} />
           
           <Route path="/admin/prestations" element={<AdminPrestations />} />
-          
+          <Route path="/admin/prestations/create" element={<AdminPrestationCreate />} />
+          <Route path="/admin/prestations/edit/:id" element={<AdminPrestationEdit />} />
+          <Route path="/admin/prestations/:id" element={<AdminPrestationDetail />} />
 
-
-
-          
           <Route path="/admin/articles" element={<AdminArticles />} />
           <Route path="/admin/bookings" element={<AdminBookings />} />
         </Routes>

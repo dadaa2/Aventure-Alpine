@@ -87,17 +87,6 @@ function PrestationsManager() {
     return "Détails disponibles";
   };
 
-  // Format du prix avec gestion des erreurs
-  const formatPrice = (price) => {
-    if (price === null || price === undefined) return '0.00';
-    try {
-      return parseFloat(price).toFixed(2);
-    } catch (error) {
-      console.error("Error formatting price:", error);
-      return '0.00';
-    }
-  };
-
   if (loading) return <div className="container mt-5 text-center"><div className="spinner-border text-primary" role="status"></div></div>;
   if (error) return <div className="container mt-5 alert alert-danger">{error}</div>;
 
@@ -144,7 +133,7 @@ function PrestationsManager() {
                         )}
                       </td>
                       <td>{getSportDetailsPreview(prestation)}</td>
-                      <td>{formatPrice(prestation.price)} €</td>
+                      <td>{prestation.price ? parseFloat(prestation.price).toFixed(2) : '0.00'} €</td>
                       <td>
                         <Link to={`/admin/prestations/${prestation.id}`} className="btn btn-sm btn-outline-info me-1" title="Voir">
                           <FontAwesomeIcon icon={faEye} />

@@ -100,6 +100,16 @@ class PrestationController {
       throw error;
     }
   }
+
+  static async getAllSports() {
+    try {
+      const response = await axios.get('http://localhost:3002/sports');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching sports:', error);
+      throw error;
+    }
+  }
 }
 
 export default PrestationController;

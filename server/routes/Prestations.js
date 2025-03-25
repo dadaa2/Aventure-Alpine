@@ -1,12 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../models');
-const { Prestation, Sport, Ski, Randonne, Escalade } = db;
+const { Prestation, Sport } = db;
 
-// Vérifiez que les modèles sont correctement importés
-console.log("Modèles disponibles:", Object.keys(db));
+// Route pour récupérer toutes les sports
+router.get('/sports/all', async (req, res) => {
+  try {
+      const sports = await Sport.findAll();
+      res.json(sports);
+  } catch (error) {
+      console.error("Error getting sports:", error);
+      res.status(500).json({ error: "An error occurred while getting the sports." });
+  }
+});
 
-// Modifier la route GET pour récupérer toutes les prestations
+// Route pour récupérer toutes les prestations
 router.get('/', async (req, res) => {
   try {
     const prestations = await Prestation.findAll({
@@ -17,21 +25,21 @@ router.get('/', async (req, res) => {
     const prestationsWithDetails = await Promise.all(prestations.map(async (prestation) => {
       const prestationData = prestation.toJSON();
       
-      // Vérifier que sport existe
+      // Ajouter une vérification que sport existe et a un nom
       if (!prestationData.sport) {
         prestationData.sportDetails = null;
         return prestationData;
       }
       
       const sportType = prestationData.sport.name.toLowerCase();
-      let sportDetails = null;
       
-      // Vérifier que les modèles existent avant de les utiliser
-      if (sportType === 'ski' && db.Ski) {
+      let sportDetails = null;
+      if (sportType === 'ski') {
         sportDetails = await db.Ski.findOne({ where: { prestationId: prestationData.id } });
-      } else if (sportType === 'randonnée' && db.Randonne) {
+      } else if (sportType === 'randonnée') {
+        // Utiliser Randonne au lieu de Randonnee
         sportDetails = await db.Randonne.findOne({ where: { prestationId: prestationData.id } });
-      } else if (sportType === 'escalade' && db.Escalade) {
+      } else if (sportType === 'escalade') {
         sportDetails = await db.Escalade.findOne({ where: { prestationId: prestationData.id } });
       }
       
@@ -150,7 +158,7 @@ router.put('/:id', async (req, res) => {
   
   try {
     const { id } = req.params;
-    const { name, price, description, sportId, sportDetails } = req.body;
+    const { name, price, description, sportId, sportDetails: sportDetailsFromBody } = req.body;
     
     // Vérifier si la prestation existe
     const prestation = await Prestation.findByPk(id);
@@ -168,7 +176,7 @@ router.put('/:id', async (req, res) => {
     }, { transaction });
     
     // Si des détails spécifiques au sport sont fournis, les mettre à jour
-    if (sportDetails) {
+    if (sportDetailsFromBody) {
       // Récupérer le sport pour connaître son type
       const sport = await Sport.findByPk(sportId);
       if (!sport) {
@@ -181,30 +189,39 @@ router.put('/:id', async (req, res) => {
       // Mettre à jour ou créer les détails spécifiques au sport
       if (sportType === 'ski') {
         const [skiDetails] = await db.Ski.findOrCreate({
-          where: { sportId },
-          defaults: { ...sportDetails, sportId }
+          where: { prestationId: id }, // Utiliser prestationId au lieu de sportId
+          defaults: { ...sportDetailsFromBody, prestationId: id }
         });
         
         if (skiDetails) {
-          await skiDetails.update(sportDetails, { transaction });
+          await skiDetails.update({
+            ...sportDetailsFromBody,
+            prestationId: id
+          }, { transaction });
         }
       } else if (sportType === 'randonnée') {
-        const [randonneeDetails] = await db.Randonnee.findOrCreate({
-          where: { sportId },
-          defaults: { ...sportDetails, sportId }
+        const [randonneeDetails] = await db.Randonne.findOrCreate({
+          where: { prestationId: id }, // Utiliser prestationId au lieu de sportId
+          defaults: { ...sportDetailsFromBody, prestationId: id }
         });
         
         if (randonneeDetails) {
-          await randonneeDetails.update(sportDetails, { transaction });
+          await randonneeDetails.update({
+            ...sportDetailsFromBody,
+            prestationId: id
+          }, { transaction });
         }
       } else if (sportType === 'escalade') {
         const [escaladeDetails] = await db.Escalade.findOrCreate({
-          where: { sportId },
-          defaults: { ...sportDetails, sportId }
+          where: { prestationId: id }, // Utiliser prestationId au lieu de sportId
+          defaults: { ...sportDetailsFromBody, prestationId: id }
         });
         
         if (escaladeDetails) {
-          await escaladeDetails.update(sportDetails, { transaction });
+          await escaladeDetails.update({
+            ...sportDetailsFromBody,
+            prestationId: id
+          }, { transaction });
         }
       }
     }
@@ -213,10 +230,25 @@ router.put('/:id', async (req, res) => {
     
     // Récupérer la prestation mise à jour avec les détails du sport
     const updatedPrestation = await Prestation.findByPk(id, {
-      include: [{ model: Sport }]
+      include: [{ model: Sport, as: 'sport' }]  // Attention à l'alias 'as'
     });
     
-    res.status(200).json(updatedPrestation);
+    // Récupérer les détails du sport associé
+    const sportType = updatedPrestation.sport ? updatedPrestation.sport.name.toLowerCase() : null;
+    let sportDetails = null;
+
+    if (sportType === 'ski') {
+      sportDetails = await db.Ski.findOne({ where: { prestationId: id } });
+    } else if (sportType === 'randonnée' && db.Randonne) {
+      sportDetails = await db.Randonne.findOne({ where: { prestationId: id } });
+    } else if (sportType === 'escalade' && db.Escalade) {
+      sportDetails = await db.Escalade.findOne({ where: { prestationId: id } });
+    }
+
+    const result = updatedPrestation.toJSON();
+    result.sportDetails = sportDetails;
+    
+    res.status(200).json(result);
   } catch (error) {
     await transaction.rollback();
     console.error("Error updating prestation:", error);
