@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3002/prestations';
+const BASE_URL = 'http://localhost:3002';
+const API_URL = `${BASE_URL}/prestations`;
+const CATEGORIES_URL = `${BASE_URL}/categories`;
+const BOOKS_URL = `${BASE_URL}/books`;
+const UPLOAD_URL = `${BASE_URL}/upload`;
+const SPORTS_URL = `${BASE_URL}/sports`;
 
 class PrestationController {
   // Récupérer toutes les prestations avec pagination
@@ -78,7 +83,7 @@ class PrestationController {
   static async getAllCategories() {
     console.log('Tentative de récupération des catégories');
     try {
-      const response = await axios.get('http://localhost:3002/categories');
+      const response = await axios.get(CATEGORIES_URL);
       console.log('Catégories récupérées:', response.data);
       return response.data;
     } catch (error) {
@@ -102,13 +107,14 @@ class PrestationController {
     }
   }
 
+  /* // Pas d'image encore
   // Télécharger une image
   static async uploadImage(file) {
     try {
       const formData = new FormData();
       formData.append('image', file);
       
-      const response = await axios.post('http://localhost:3002/upload', formData, {
+      const response = await axios.post(UPLOAD_URL, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -118,11 +124,11 @@ class PrestationController {
       console.error('Error uploading image:', error);
       throw error;
     }
-  }
+  } */
 
   static async getAllSports() {
     try {
-      const response = await axios.get('http://localhost:3002/sports');
+      const response = await axios.get(SPORTS_URL);
       return response.data;
     } catch (error) {
       console.error('Error fetching sports:', error);
