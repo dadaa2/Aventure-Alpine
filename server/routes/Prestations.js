@@ -99,57 +99,63 @@ router.get('/:id', async (req, res) => {
 
 // Créer une prestation avec les détails du sport
 router.post('/', async (req, res) => {
-    const transaction = await db.sequelize.transaction();
-    
-    try {
-        const { name, price, description, sportId, sportDetails } = req.body;
-        
-        // Création de la prestation
-        const newPrestation = await Prestation.create({
-            name,
-            price,
-            description,
-            sportId
-        }, { transaction });
-        
-        // Si des détails spécifiques au sport sont fournis, les enregistrer
-        if (sportDetails) {
-            // Récupérer le sport pour connaître son type
-            const sport = await Sport.findByPk(sportId);
-            
-            if (!sport) {
-                await transaction.rollback();
-                return res.status(404).json({ error: "Sport not found" });
-            }
-            
-            const sportType = sport.name.toLowerCase();
-            
-            // Créer les détails spécifiques au sport
-            if (sportType === 'ski') {
-                await db.Ski.create({
-                    ...sportDetails,
-                    sportId
-                }, { transaction });
-            } else if (sportType === 'randonnée') {
-                await db.Randonnee.create({
-                    ...sportDetails,
-                    sportId
-                }, { transaction });
-            } else if (sportType === 'escalade') {
-                await db.Escalade.create({
-                    ...sportDetails,
-                    sportId
-                }, { transaction });
-            }
-        }
-        
-        await transaction.commit();
-        res.status(201).json(newPrestation);
-    } catch (error) {
-        await transaction.rollback();
-        console.error("Error creating prestation:", error);
-        res.status(500).json({ error: "An error occurred while creating the prestation." });
-    }
+  const transaction = await db.sequelize.transaction();
+  
+  try {
+      const { name, price, description, sportId, sportDetails } = req.body;
+      
+      // Création de la prestation
+      const newPrestation = await Prestation.create({
+          name,
+          price,
+          description,
+          sportId
+      }, { transaction });
+      
+      // Si des détails spécifiques au sport sont fournis, les enregistrer
+      if (sportDetails) {
+          // Récupérer le sport pour connaître son type
+          const sport = await Sport.findByPk(sportId);
+          
+          if (!sport) {
+              await transaction.rollback();
+              return res.status(404).json({ error: "Sport not found" });
+          }
+          
+          const sportType = sport.name.toLowerCase();
+          
+          // Créer les détails spécifiques au sport
+          if (sportType === 'ski') {
+              await db.Ski.create({
+                  ...sportDetails,
+                  prestationId: newPrestation.id // Correction: utiliser prestationId au lieu de sportId
+              }, { transaction });
+          } else if (sportType === 'randonnée') {
+              await db.Randonne.create({ // Correction: Randonne au lieu de Randonnee
+                  ...sportDetails,
+                  prestationId: newPrestation.id // Correction: utiliser prestationId au lieu de sportId
+              }, { transaction });
+          } else if (sportType === 'escalade') {
+              await db.Escalade.create({
+                  ...sportDetails,
+                  prestationId: newPrestation.id // Correction: utiliser prestationId au lieu de sportId
+              }, { transaction });
+          }
+      }
+      
+      await transaction.commit();
+      
+      // Retourner la prestation avec ses détails
+      const completePrestation = await Prestation.findByPk(newPrestation.id, {
+          include: [{ model: Sport, as: 'sport' }]
+      });
+      
+      res.status(201).json(completePrestation);
+  } catch (error) {
+      await transaction.rollback();
+      console.error("Error creating prestation:", error);
+      res.status(500).json({ error: "An error occurred while creating the prestation." });
+  }
 });
 
 // Mise à jour de la route PUT pour modifier une prestation
@@ -269,17 +275,6 @@ router.delete('/:id', async (req, res) => {
     } catch (error) {
         console.error("Error deleting prestation:", error);
         res.status(500).json({ error: "An error occurred while deleting the prestation." });
-    }
-});
-
-// Récupérer tous les sports (pour le formulaire de prestation)
-router.get('/sports/all', async (req, res) => {
-    try {
-        const sports = await Sport.findAll();
-        res.json(sports);
-    } catch (error) {
-        console.error("Error getting sports:", error);
-        res.status(500).json({ error: "An error occurred while getting the sports." });
     }
 });
 
