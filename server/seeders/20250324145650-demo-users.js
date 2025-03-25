@@ -11,15 +11,15 @@ module.exports = {
 
     try {
       // Pré-hachage des mots de passe communs (opération coûteuse)
-      console.time('Password hashing');
+      console.time('Password hashing for fixed users');
       const adminPassword = await bcrypt.hash('password123', 10);
       const authorPassword = await bcrypt.hash('author', 10);
-      const userPassword = await bcrypt.hash('password123', 10);
-      console.timeEnd('Password hashing');
+      const davidUserPassword = await bcrypt.hash('davidddd', 10);
+      console.timeEnd('Password hashing for fixed users');
 
       const users = [];
       
-      // Admin et auteur
+      // Admin, auteur et utilisateur régulier avec mots de passe spécifiques
       users.push({
         id: uuidv1(),
         mail: 'admin@example.com',
@@ -50,12 +50,48 @@ module.exports = {
         updatedAt: new Date()
       });
 
-      // Génération en masse des utilisateurs réguliers
+      users.push({
+        id: uuidv1(),
+        mail: 'david@example.com',
+        pseudo: 'davidPseudo',
+        password: davidUserPassword,
+        firstName: 'Admin',
+        lastName: 'User',
+        street: faker.location.streetAddress(),
+        city: faker.location.city(),
+        zipCode: faker.location.zipCode('#####'),
+        roleId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+
+      // Génération en masse des utilisateurs réguliers avec mots de passe différents
       console.time('Users generation');
-      // Vous pouvez réduire ce nombre en développement si nécessaire
-      const userCount = process.env.NODE_ENV === 'production' ? 100 : 20;
+      
+      // Vous pouvez réduire ce nombre en développement si nécessaire avec x : n ou x en dev et n en prod
+      const userCount = process.env.NODE_ENV === 'production' ? 200 : 0;
+      
+      // Pré-générer les mots de passe pour traitement par lots
+      console.time('Generate password list');
+      // Générer une liste de mots de passe aléatoires
+      const passwordList = Array.from({ length: userCount }, () => 
+        faker.internet.password({ length: 8, memorable: true })
+      );
+      console.timeEnd('Generate password list');
+      
+      // Hasher tous les mots de passe en parallèle pour une meilleure performance
+      console.time('Batch password hashing');
+      // Utiliser un facteur de coût moins élevé pour les données de test
+      const costFactor = process.env.NODE_ENV === 'production' ? 10 : 8;
+      
+      // Hasher tous les mots de passe en parallèle (Promise.all est plus rapide)
+      const hashedPasswords = await Promise.all(
+        passwordList.map(pwd => bcrypt.hash(pwd, costFactor))
+      );
+      console.timeEnd('Batch password hashing');
       
       // Création d'utilisateurs par lots pour une meilleure performance
+      console.time('Users object creation');
       const now = new Date();
       
       for (let i = 0; i < userCount; i++) {
@@ -65,8 +101,8 @@ module.exports = {
         users.push({
           id: uuidv1(),
           mail: faker.internet.email({ firstName, lastName }),
-          pseudo: faker.internet.username({ firstName, lastName }).substring(0, 30), // Limite à 30 caractères
-          password: userPassword, // Utilisation du hash pré-calculé
+          pseudo: faker.internet.username({ firstName, lastName }).substring(0, 30),
+          password: hashedPasswords[i], // Utiliser le hash unique pré-calculé
           firstName,
           lastName,
           street: faker.location.streetAddress(),
@@ -77,6 +113,7 @@ module.exports = {
           updatedAt: now
         });
       }
+      console.timeEnd('Users object creation');
       console.timeEnd('Users generation');
 
       // Insertion avec logs de performance
