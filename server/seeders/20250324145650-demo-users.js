@@ -14,7 +14,7 @@ module.exports = {
       console.time('Password hashing for fixed users');
       const adminPassword = await bcrypt.hash('password123', 10);
       const authorPassword = await bcrypt.hash('author', 10);
-      const davidUserPassword = await bcrypt.hash('davidddd', 10);
+      const jardinUserPassword = await bcrypt.hash('jardin123', 10);
       console.timeEnd('Password hashing for fixed users');
 
       const users = [];
@@ -52,11 +52,11 @@ module.exports = {
 
       users.push({
         id: uuidv1(),
-        mail: 'david@example.com',
-        pseudo: 'davidPseudo',
-        password: davidUserPassword,
-        firstName: 'Admin',
-        lastName: 'User',
+        mail: 'jardin@example.com',
+        pseudo: 'jardin123',
+        password: jardinUserPassword,
+        firstName: 'prenomJardin',
+        lastName: 'nomJardin',
         street: faker.location.streetAddress(),
         city: faker.location.city(),
         zipCode: faker.location.zipCode('#####'),

@@ -1,125 +1,120 @@
-/* Import de librairie */
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../pages/auth/AuthContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faSignOutAlt, faUserShield, faHome, faHiking, faBookOpen } from '@fortawesome/free-solid-svg-icons';
 
 function Header() {
+  const { currentUser, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  // Fonction simplifiée pour naviguer
-  const handleNavigation = (path, event) => {
-    // Empêcher la navigation par défaut du lien
-    if (event) event.preventDefault();
-    
-    // Fermer tous les dropdowns ouverts
-    const dropdowns = document.querySelectorAll('.dropdown-menu.show');
-    dropdowns.forEach(dropdown => {
-      dropdown.classList.remove('show');
-    });
-    
-    // Utiliser navigate pour changer de page
-    navigate(path);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Failed to log out', error);
+    }
   };
 
   return (
-    <div className='header'>
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <div className="container-fluid">
-          <Link to="/" className="navbar-brand">
-            <img src="/logo.png" alt="Aventure Alpine" height="40" />
+    <header>
+      <nav className="navbar navbar-expand-lg navbar-light bg-light py-3 shadow-sm">
+        <div className="container">
+          <Link className="navbar-brand fw-bold" to="/">
+            Aventure Alpine
           </Link>
-          
           <button 
             className="navbar-toggler" 
             type="button" 
             data-bs-toggle="collapse" 
-            data-bs-target="#navbarNav"
+            data-bs-target="#navbarNav" 
+            aria-controls="navbarNav" 
+            aria-expanded="false" 
+            aria-label="Toggle navigation"
           >
             <span className="navbar-toggler-icon"></span>
           </button>
-          
           <div className="collapse navbar-collapse" id="navbarNav">
-            <ul className="navbar-nav ms-auto">
+            <ul className="navbar-nav me-auto">
               <li className="nav-item">
-                <Link to="/" className='nav-link' onClick={(e) => handleNavigation('/', e)}>Accueil</Link>  
+                <Link className="nav-link" to="/">
+                  <FontAwesomeIcon icon={faHome} className="me-1" /> Accueil
+                </Link>
               </li>
               <li className="nav-item">
-                <Link to="/prestations" className='nav-link' onClick={(e) => handleNavigation('/prestations', e)}>Prestations</Link>
+                <Link className="nav-link" to="/prestations">
+                  <FontAwesomeIcon icon={faHiking} className="me-1" /> Prestations
+                </Link>
               </li>
-              <li className="nav-item">
-                <Link to="/articles" className='nav-link' onClick={(e) => handleNavigation('/articles', e)}>Articles</Link>
-              </li>
-
-              {/* Menu Admin - accessible à tous */}
-              <li className="nav-item dropdown">
-                <a href="#" className='nav-link dropdown-toggle' 
-                  id="adminDropdown" 
-                  role="button" 
-                  data-bs-toggle="dropdown" 
-                  aria-expanded="false">
-                  Administration
-                </a>
-                <ul className='dropdown-menu dropdown-menu-right' aria-labelledby="adminDropdown">
-                  <li>
-                    <Link to="/admin/users" className="dropdown-item" onClick={(e) => handleNavigation('/admin/users', e)}>
-                      Gestion utilisateurs
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/admin/articles" className="dropdown-item" onClick={(e) => handleNavigation('/admin/articles', e)}>
-                      Gestion articles
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/admin/prestations" className="dropdown-item" onClick={(e) => handleNavigation('/admin/prestations', e)}>
-                      Gestion prestations
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/admin/bookings" className="dropdown-item" onClick={(e) => handleNavigation('/admin/bookings', e)}>
-                      Gestion réservations
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-
-              {/* Menu utilisateur - accessible à tous */}
-              <li className="nav-item dropdown">
-                <a href="#" className='nav-link dropdown-toggle' 
-                  id="userDropdown" 
-                  role="button" 
-                  data-bs-toggle="dropdown" 
-                  aria-expanded="false">
-                  Mon compte
-                </a>
-                <ul className='dropdown-menu dropdown-menu-right' aria-labelledby="userDropdown">
-                  <li>
-                    <Link to="/user/profile" className="dropdown-item" onClick={(e) => handleNavigation('/user/profile', e)}>
-                      Mon profil
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/user/bookings" className="dropdown-item" onClick={(e) => handleNavigation('/user/bookings', e)}>
-                      Mes réservations
-                    </Link>
-                  </li>
-                  <li><hr className="dropdown-divider"/></li>
-                  <li>
-                    <Link to="/user/settings" className="dropdown-item" onClick={(e) => handleNavigation('/user/settings', e)}>
-                      Paramètres
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/login" className="dropdown-item" onClick={(e) => handleNavigation('/login', e)}>
+              {/* Autres liens de navigation */}
+            </ul>
+            
+            <div className="navbar-nav">
+              {currentUser ? (
+                <li className="nav-item dropdown">
+                  <a 
+                    className="nav-link dropdown-toggle" 
+                    href="#" 
+                    id="navbarDropdown" 
+                    role="button" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                  >
+                    <FontAwesomeIcon icon={faUser} className="me-1" />
+                    {currentUser.pseudo || 'Mon compte'}
+                  </a>
+                  <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li>
+                      <Link className="dropdown-item" to="/user/profile">
+                        Mon profil
+                      </Link>
+                    </li>
+                    <li>
+                      <Link className="dropdown-item" to="/user/bookings">
+                        <FontAwesomeIcon icon={faBookOpen} className="me-1" /> Mes réservations
+                      </Link>
+                    </li>
+                    {isAdmin() && (
+                      <>
+                        <li><hr className="dropdown-divider" /></li>
+                        <li>
+                          <Link className="dropdown-item" to="/admin">
+                            <FontAwesomeIcon icon={faUserShield} className="me-1" /> Administration
+                          </Link>
+                        </li>
+                      </>
+                    )}
+                    <li><hr className="dropdown-divider" /></li>
+                    <li>
+                      <button 
+                        className="dropdown-item" 
+                        onClick={handleLogout}
+                      >
+                        <FontAwesomeIcon icon={faSignOutAlt} className="me-1" /> Déconnexion
+                      </button>
+                    </li>
+                  </ul>
+                </li>
+              ) : (
+                <>
+                  <li className="nav-item">
+                    <Link className="nav-link btn btn-outline-primary me-2" to="/login">
                       Connexion
                     </Link>
                   </li>
-                </ul>
-              </li>
-            </ul>
+                  <li className="nav-item">
+                    <Link className="nav-link btn btn-primary" to="/register">
+                      Inscription
+                    </Link>
+                  </li>
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </nav>  
-    </div>
+      </nav>
+    </header>
   );
 }
 

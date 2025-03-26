@@ -1,10 +1,21 @@
 const express = require('express'); // instance du serveur
+const cors = require('cors'); // permet de faire des requetes entre serveurs
 const app = express(); //cela permet de faire les requetes servers
-const cors = require('cors') // permet de faire des requetes entre serveurs
-const { runSeeders } = require('./utils/seeders');
 
-app.use(cors());
+// Appliquer CORS avant les autres middlewares
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+const { runSeeders } = require('./utils/seeders');
+const authRoutes = require('./routes/Auth');
+const { auth, checkRole } = require('./middleware/Auth');
 
 const db = require('./models'); 
 
@@ -43,6 +54,26 @@ app.use('/randonnes', randonnesRouter);
 // Router escalades
 const escaladesRouter = require('./routes/Escalades');
 app.use('/escalades', escaladesRouter);
+
+// Routes publiques
+app.use('/auth', authRoutes);
+
+// Routes protégées par authentification
+app.use('/bookings', auth, bookingsRouter);
+
+// Ligne simplifiée pour les routes admin - accessible uniquement avec le roleId 3
+app.use('/admin', auth, checkRole([3]), (req, res, next) => {
+  // Simple vérification pour rediriger vers les bons contrôleurs
+  const path = req.path.split('/')[1]; // Récupère le premier segment après /admin
+  
+  if (path === 'users') {
+    require('./routes/User')(req, res, next);
+  } else if (path === 'prestations') {
+    require('./routes/Prestations')(req, res, next);
+  } else {
+    res.status(404).json({ error: "Route non trouvée" });
+  }
+});
 
 // Initialisation de la base de données avec étapes détaillées
 const initializeDatabase = async () => {

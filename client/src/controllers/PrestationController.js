@@ -6,16 +6,57 @@ const CATEGORIES_URL = `${BASE_URL}/categories`;
 const SPORTS_URL = `${BASE_URL}/sports`;
 
 class PrestationController {
-  // Récupérer toutes les prestations avec pagination
-  static async getPrestations(page = 1, limit = 10, searchTerm = '') {
+  // Méthode modifiée pour supporter tous les filtres
+  static async getPrestations(page = 1, limit = 10, searchTerm = '', additionalParams = {}) {
     try {
-      const params = { page, limit };
+      const params = { 
+        page, 
+        limit,
+        ...additionalParams
+      };
+      
       if (searchTerm) params.search = searchTerm;
       
-      const response = await axios.get(API_URL, { params });
+      console.log('PrestationController - Requête au serveur avec paramètres:', params);
+      console.log('PrestationController - URL complète:', `${API_URL}?` + new URLSearchParams(params).toString());
+      
+      const response = await axios.get(API_URL, { 
+        params,
+        withCredentials: true,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        timeout: 10000
+      });
+      
+      console.log('PrestationController - Réponse reçue:', {
+        status: response.status,
+        dataType: typeof response.data,
+        hasRows: !!response.data.rows,
+        rowsLength: response.data.rows ? response.data.rows.length : 0,
+        count: response.data.count || 0
+      });
+      
       return response.data;
     } catch (error) {
-      console.error('Error fetching prestations:', error);
+      console.error('PrestationController - Erreur détaillée:');
+      if (error.response) {
+        // La requête a été effectuée et le serveur a répondu avec un code d'état
+        console.error('Réponse d\'erreur:', {
+          data: error.response.data,
+          status: error.response.status,
+          headers: error.response.headers,
+        });
+      } else if (error.request) {
+        // La requête a été effectuée mais aucune réponse n'a été reçue
+        console.error('Requête sans réponse:', error.request);
+      } else {
+        // Une erreur s'est produite lors de la configuration de la requête
+        console.error('Erreur de requête:', error.message);
+      }
+      
+      // Re-throw pour permettre au composant de gérer l'erreur
       throw error;
     }
   }
