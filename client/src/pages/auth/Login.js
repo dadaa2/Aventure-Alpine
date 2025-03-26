@@ -10,12 +10,21 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
-  const { login } = useAuth();
+  const { login, isAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Rediriger vers la page précédente après connexion ou vers le dashboard
-  const from = location.state?.from?.pathname || '/user/dashboard';
+  // Modifier cette ligne pour rediriger vers la page d'accueil par défaut
+  // ou vers la page admin si c'est un administrateur
+  const getDefaultRedirect = () => {
+    // Si l'utilisateur venait d'une page spécifique (protégée), y retourner
+    if (location.state?.from?.pathname) {
+      return location.state.from.pathname;
+    }
+    
+    // Sinon, aller à la page d'accueil
+    return '/';
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +34,7 @@ function Login() {
       setLoading(true);
       
       await login(email, password);
-      navigate(from, { replace: true });
+      navigate(getDefaultRedirect(), { replace: true });
     } catch (error) {
       console.error('Login error:', error);
       setError('Email ou mot de passe incorrect');

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './auth/AuthContext';
 import axios from 'axios';
+// Ajouter l'import du controller
+import BookingController from '../controllers/BookingController';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faCalendar, faUsers, faShoppingCart, 
@@ -273,41 +275,59 @@ function PrestationDetail() {
     e.preventDefault();
     
     if (!currentUser) {
-      navigate('/login', { state: { from: { pathname: `/prestations/${id}` } } });
+      navigate('/login', { state: { from: `/prestations/${id}` } });
       return;
     }
     
-    setBookingLoading(true);
-    setBookingError('');
-    setBookingSuccess('');
-    
     try {
-      // Vérification des dates
-      if (bookingData.startPrestation >= bookingData.endPrestation) {
-        throw new Error('La date de fin doit être après la date de début');
-      }
+      setBookingLoading(true);
+      setBookingError('');
+      setBookingSuccess('');
       
-      // Création de la réservation
-      const response = await axios.post('http://localhost:3002/books', {
+      // Utiliser un nom différent pour éviter le conflit
+      const newBooking = {
         userId: currentUser.id,
-        prestationId: prestation.id,
+        prestationId: parseInt(id),
         startPrestation: bookingData.startPrestation,
         endPrestation: bookingData.endPrestation,
-        numberPerson: bookingData.numberPerson
-      });
+        numberPerson: parseInt(bookingData.numberPerson),
+        totalPrice: calculateTotalPrice()
+      };
       
-      setBookingSuccess('Votre réservation a été créée avec succès !');
+      console.log('Envoi des données de réservation:', newBooking);
       
-      // Rediriger vers les détails de la réservation après un délai
+      // Utiliser le controller avec le nouvel objet correctement nommé
+      const result = await BookingController.createBooking(newBooking);
+      
+      console.log('Réservation créée avec succès:', result);
+      setBookingSuccess('Votre réservation a été effectuée avec succès!');
+      
+      // Réinitialiser le formulaire ou rediriger
       setTimeout(() => {
-        navigate(`/user/bookings/${response.data.id}`);
+        navigate('/user/bookings');
       }, 2000);
+      
     } catch (err) {
-      console.error('Error creating booking:', err);
-      setBookingError(err.response?.data?.error || err.message || 'Erreur lors de la création de la réservation');
+      console.error('Erreur lors de la réservation:', err);
+      setBookingError(err.response?.data?.error || 'Une erreur est survenue lors de la réservation. Veuillez réessayer.');
     } finally {
       setBookingLoading(false);
     }
+  };
+  
+  // Fonction utilitaire pour calculer le prix total
+  const calculateTotalPrice = () => {
+    if (!prestation) return 0;
+    const days = calculateDays();
+    return prestation.price * bookingData.numberPerson * days;
+  };
+  
+  const calculateDays = () => {
+    const start = new Date(bookingData.startPrestation);
+    const end = new Date(bookingData.endPrestation);
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays || 1; // Minimum 1 jour
   };
 
   // États de chargement et d'erreur

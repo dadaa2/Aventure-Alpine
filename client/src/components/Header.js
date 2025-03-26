@@ -2,7 +2,10 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../pages/auth/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faSignOutAlt, faUserShield, faHome, faHiking, faBookOpen } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faUser, faSignOutAlt, faUserShield, faHome, faHiking, faBookOpen,
+  faUsers, faMountain, faCalendarCheck
+} from '@fortawesome/free-solid-svg-icons';
 
 function Header() {
   const { currentUser, logout, isAdmin } = useAuth();
@@ -47,7 +50,58 @@ function Header() {
                   <FontAwesomeIcon icon={faHiking} className="me-1" /> Prestations
                 </Link>
               </li>
-              {/* Autres liens de navigation */}
+              {/* Menu admin directement accessible */}
+              {currentUser && isAdmin() && (
+                <li className="nav-item dropdown">
+                  <a 
+                    className="nav-link dropdown-toggle" 
+                    href="#" 
+                    id="adminDropdown" 
+                    role="button" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false"
+                  >
+                    <FontAwesomeIcon icon={faUserShield} className="me-1" />
+                    Administration
+                  </a>
+                  <ul className="dropdown-menu" aria-labelledby="adminDropdown">
+
+                    {/* <li>
+                      <Link className="dropdown-item" to="/admin">
+                        <FontAwesomeIcon icon={faTachometerAlt} className="me-2" /> Tableau de bord
+                      </Link>
+                    </li>
+                    <li><hr className="dropdown-divider" /></li> */}
+
+                    <li>
+                      <Link className="dropdown-item" to="/admin/users">
+                        <FontAwesomeIcon icon={faUsers} className="me-2" /> Gestion des utilisateurs
+                      </Link>
+                    </li>
+                    <li>
+                      <Link className="dropdown-item" to="/admin/prestations">
+                        <FontAwesomeIcon icon={faMountain} className="me-2" /> Gestion des prestations
+                      </Link>
+                    </li>
+                    <li>
+                      <Link className="dropdown-item" to="/admin/bookings">
+                        <FontAwesomeIcon icon={faCalendarCheck} className="me-2" /> Gestion des réservations
+                      </Link>
+                    </li>
+                    {/* <li><hr className="dropdown-divider" /></li>
+                    <li>
+                      <Link className="dropdown-item" to="/admin/stats">
+                        <FontAwesomeIcon icon={faChartLine} className="me-2" /> Statistiques
+                      </Link>
+                    </li>
+                    <li>
+                      <Link className="dropdown-item" to="/admin/settings">
+                        <FontAwesomeIcon icon={faCog} className="me-2" /> Paramètres
+                      </Link>
+                    </li> */}
+                  </ul>
+                </li>
+              )}
             </ul>
             
             <div className="navbar-nav">
@@ -65,17 +119,17 @@ function Header() {
                     {currentUser.pseudo || 'Mon compte'}
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li>
+                    {/* <li>
                       <Link className="dropdown-item" to="/user/profile">
                         Mon profil
                       </Link>
-                    </li>
+                    </li> */}
                     <li>
                       <Link className="dropdown-item" to="/user/bookings">
                         <FontAwesomeIcon icon={faBookOpen} className="me-1" /> Mes réservations
                       </Link>
                     </li>
-                    {isAdmin() && (
+                    {/* {isAdmin() && (
                       <>
                         <li><hr className="dropdown-divider" /></li>
                         <li>
@@ -84,7 +138,7 @@ function Header() {
                           </Link>
                         </li>
                       </>
-                    )}
+                    )} */}
                     <li><hr className="dropdown-divider" /></li>
                     <li>
                       <button 

@@ -6,6 +6,7 @@ import { faArrowLeft, faSave, faCalendar, faUser, faPersonHiking } from '@fortaw
 import BookingController from '../../../controllers/BookingController';
 import UserController from '../../../controllers/UserController';
 import axios from 'axios';
+import Select from 'react-select'; // Ajout de l'import React-Select
 
 function BookingCreate() {
   const navigate = useNavigate();
@@ -16,6 +17,12 @@ function BookingCreate() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  
+  // Options pour React-Select
+  const [userOptions, setUserOptions] = useState([]);
+  const [prestationOptions, setPrestationOptions] = useState([]);
+  const [selectedUserOption, setSelectedUserOption] = useState(null);
+  const [selectedPrestationOption, setSelectedPrestationOption] = useState(null);
   
   const [formData, setFormData] = useState({
     userId: '',
@@ -34,11 +41,35 @@ function BookingCreate() {
       try {
         // Récupérer les utilisateurs
         const usersData = await UserController.getUsers();
-        setUsers(usersData.rows || []);
+        const usersArray = usersData.rows || [];
+        setUsers(usersArray);
+        
+        // Transformer les données utilisateurs pour React-Select
+        const formattedUserOptions = usersArray.map(user => ({
+          value: user.id,
+          label: `${user.mail} ${user.firstName && user.lastName ? `(${user.firstName} ${user.lastName})` : ''}`
+        }));
+        setUserOptions(formattedUserOptions);
         
         // Récupérer les prestations
         const prestationsResponse = await axios.get('http://localhost:3002/prestations');
-        setPrestations(prestationsResponse.data || []);
+        
+        // Gérer différentes structures possibles de réponse
+        const prestationsData = Array.isArray(prestationsResponse.data) 
+          ? prestationsResponse.data 
+          : (prestationsResponse.data.rows || []);
+          
+        setPrestations(prestationsData);
+        
+        // Transformer les données prestations pour React-Select
+        const formattedPrestationOptions = prestationsData.map(prestation => ({
+          value: prestation.id,
+          label: `${prestation.name} ${prestation.price ? `(${prestation.price} €)` : '(Prix non défini)'}`,
+          price: prestation.price || 0
+        }));
+        setPrestationOptions(formattedPrestationOptions);
+        
+        console.log('Données chargées avec succès');
       } catch (err) {
         console.error('Error fetching form data:', err);
         setError('Erreur lors du chargement des données');
@@ -58,6 +89,23 @@ function BookingCreate() {
   const handleNumberChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: parseInt(value, 10) });
+  };
+  
+  // Gestionnaires pour React-Select
+  const handleUserChange = (selectedOption) => {
+    setSelectedUserOption(selectedOption);
+    setFormData({
+      ...formData,
+      userId: selectedOption ? selectedOption.value : ''
+    });
+  };
+  
+  const handlePrestationChange = (selectedOption) => {
+    setSelectedPrestationOption(selectedOption);
+    setFormData({
+      ...formData,
+      prestationId: selectedOption ? selectedOption.value : ''
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -97,6 +145,23 @@ function BookingCreate() {
     }
   };
 
+  // Styles personnalisés pour React-Select
+  const customStyles = {
+    control: (provided) => ({
+      ...provided,
+      borderColor: '#ced4da',
+      boxShadow: 'none',
+      '&:hover': {
+        borderColor: '#80bdff'
+      }
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isSelected ? '#0d6efd' : state.isFocused ? '#e9ecef' : null,
+      color: state.isSelected ? 'white' : 'black'
+    })
+  };
+
   return (
     <div className="container my-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -130,54 +195,68 @@ function BookingCreate() {
             <form onSubmit={handleSubmit}>
               <div className="row mb-4">
                 <div className="col-md-6">
-                  {/* Sélection du client */}
+                  {/* Sélection du client avec React-Select */}
                   <div className="mb-3">
                     <label htmlFor="userId" className="form-label">Client <span className="text-danger">*</span></label>
                     <div className="input-group">
                       <span className="input-group-text">
                         <FontAwesomeIcon icon={faUser} />
                       </span>
-                      <select 
+                      <Select
                         id="userId"
                         name="userId"
-                        className="form-select"
-                        value={formData.userId}
-                        onChange={handleChange}
-                        required
-                      >
-                        <option value="">Sélectionnez un client...</option>
-                        {users.map(user => (
-                          <option key={user.id} value={user.id}>
-                            {user.firstName} {user.lastName} ({user.mail})
-                          </option>
-                        ))}
-                      </select>
+                        value={selectedUserOption}
+                        onChange={handleUserChange}
+                        options={userOptions}
+                        placeholder="Rechercher un client..."
+                        noOptionsMessage={() => "Aucun client trouvé"}
+                        isClearable
+                        isSearchable
+                        className="basic-select"
+                        classNamePrefix="select"
+                        styles={{
+                          ...customStyles,
+                          container: (provided) => ({
+                            ...provided,
+                            flex: '1 1 auto',
+                            width: '1%'
+                          })
+                        }}
+                      />
                     </div>
+                    {!formData.userId && <div className="text-danger mt-1 small">Veuillez sélectionner un client</div>}
                   </div>
                   
-                  {/* Sélection de la prestation */}
+                  {/* Sélection de la prestation avec React-Select */}
                   <div className="mb-3">
                     <label htmlFor="prestationId" className="form-label">Prestation <span className="text-danger">*</span></label>
                     <div className="input-group">
                       <span className="input-group-text">
                         <FontAwesomeIcon icon={faPersonHiking} />
                       </span>
-                      <select 
+                      <Select
                         id="prestationId"
                         name="prestationId"
-                        className="form-select"
-                        value={formData.prestationId}
-                        onChange={handleChange}
-                        required
-                      >
-                        <option value="">Sélectionnez une prestation...</option>
-                        {prestations.map(prestation => (
-                          <option key={prestation.id} value={prestation.id}>
-                            {prestation.name} ({prestation.price ? `${prestation.price} €` : 'Prix non défini'})
-                          </option>
-                        ))}
-                      </select>
+                        value={selectedPrestationOption}
+                        onChange={handlePrestationChange}
+                        options={prestationOptions}
+                        placeholder="Rechercher une prestation..."
+                        noOptionsMessage={() => "Aucune prestation trouvée"}
+                        isClearable
+                        isSearchable
+                        className="basic-select"
+                        classNamePrefix="select"
+                        styles={{
+                          ...customStyles,
+                          container: (provided) => ({
+                            ...provided,
+                            flex: '1 1 auto',
+                            width: '1%'
+                          })
+                        }}
+                      />
                     </div>
+                    {!formData.prestationId && <div className="text-danger mt-1 small">Veuillez sélectionner une prestation</div>}
                   </div>
                 </div>
                 
@@ -222,7 +301,7 @@ function BookingCreate() {
                 </div>
               </div>
               
-              {/* Nombre de participants */}
+              {/* Le reste du formulaire reste inchangé */}
               <div className="mb-3">
                 <label htmlFor="numberPerson" className="form-label">Nombre de participants <span className="text-danger">*</span></label>
                 <input 
@@ -237,7 +316,6 @@ function BookingCreate() {
                 />
               </div>
               
-              {/* Commentaire (optionnel) */}
               <div className="mb-4">
                 <label htmlFor="commentary" className="form-label">Commentaire</label>
                 <textarea 

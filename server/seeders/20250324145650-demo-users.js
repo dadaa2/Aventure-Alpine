@@ -52,7 +52,7 @@ module.exports = {
 
       users.push({
         id: uuidv1(),
-        mail: 'jardin@example.com',
+        mail: 'jardin123@example.com',
         pseudo: 'jardin123',
         password: jardinUserPassword,
         firstName: 'prenomJardin',
@@ -68,8 +68,8 @@ module.exports = {
       // Génération en masse des utilisateurs réguliers avec mots de passe différents
       console.time('Users generation');
       
-      // Vous pouvez réduire ce nombre en développement si nécessaire avec x : n ou x en dev et n en prod
-      const userCount = process.env.NODE_ENV === 'production' ? 200 : 0;
+      // Paramètre création x : n ou x en dev et n en prod
+      const userCount = /* process.env.NODE_ENV === 'production' ? 200 :  */ 100;
       
       // Pré-générer les mots de passe pour traitement par lots
       console.time('Generate password list');
