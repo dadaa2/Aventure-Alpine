@@ -127,6 +127,43 @@ router.post('/', async (req, res) => {
             return res.status(404).json({ error: "Prestation not found" });
         }
         
+        // Vérifier si l'utilisateur a déjà une réservation pour cette prestation à ces dates
+        const existingBooking = await Book.findOne({
+            where: {
+                userId,
+                prestationId,
+                [Op.or]: [
+                    // Nouvelle date de début entre dates existantes
+                    {
+                        startPrestation: { [Op.lte]: startPrestation },
+                        endPrestation: { [Op.gte]: startPrestation }
+                    },
+                    // Nouvelle date de fin entre dates existantes
+                    {
+                        startPrestation: { [Op.lte]: endPrestation },
+                        endPrestation: { [Op.gte]: endPrestation }
+                    },
+                    // Dates existantes comprises entre nouvelles dates
+                    {
+                        startPrestation: { [Op.gte]: startPrestation },
+                        endPrestation: { [Op.lte]: endPrestation }
+                    }
+                ]
+            }
+        });
+        
+        if (existingBooking) {
+            return res.status(400).json({ 
+                error: "Vous avez déjà réservé cette prestation pour ces dates",
+                code: "BOOKING_DATE_CONFLICT",
+                existingBooking: {
+                    id: existingBooking.id,
+                    startDate: existingBooking.startPrestation,
+                    endDate: existingBooking.endPrestation
+                }
+            });
+        }
+        
         const newBooking = await Book.create({
             userId,
             prestationId,

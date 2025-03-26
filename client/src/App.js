@@ -5,8 +5,8 @@ import Footer from './components/Footer';
 
 // Pages publiques
 import Home from './pages/Home';
-import PrestationsMain from './pages/PrestationsMain';
-import PrestationDetail from './pages/PrestationDetail';
+import PrestationsMain from './pages/prestation/PrestationsMain';
+import PrestationDetail from './pages/prestation/PrestationDetail';
 import ArticlesMain from './pages/ArticlesMain';
 import ArticleDetail from './pages/ArticleDetail';
 
@@ -25,10 +25,12 @@ import AdminUsers from './pages/admin/users/UsersManager';
 import AdminUserDetail from './pages/admin/users/UserDetail';
 import AdminUserCreate from './pages/admin/users/UserCreate';
 import AdminUserEdit from './pages/admin/users/UserEdit';
+
 import AdminPrestations from './pages/admin/prestations/PrestationsManager';
 import AdminPrestationCreate from './pages/admin/prestations/PrestationCreate';
 import AdminPrestationEdit from './pages/admin/prestations/PrestationEdit';
-import AdminPrestationDetail from './pages/admin/prestations/PrestationDetail';
+import AdminPrestationDetail from './pages/admin/prestations/PrestationDetail'
+;
 import AdminBookings from './pages/admin/bookings/BookingsManager';
 import AdminBookingDetail from './pages/admin/bookings/BookingDetail';
 import AdminBookingCreate from './pages/admin/bookings/BookingCreate';
