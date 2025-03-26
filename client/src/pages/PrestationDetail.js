@@ -17,7 +17,8 @@ import {
   faMapMarkerAlt,
   faRulerHorizontal,
   faMountainSun,
-  faChevronRight
+  faChevronRight,
+  faCalendarXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import { format, addDays } from 'date-fns';
 
@@ -38,6 +39,7 @@ function PrestationDetail() {
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingError, setBookingError] = useState('');
   const [bookingSuccess, setBookingSuccess] = useState('');
+  const [bookingErrorType, setBookingErrorType] = useState(null);
 
   useEffect(() => {
     const fetchPrestation = async () => {
@@ -283,8 +285,9 @@ function PrestationDetail() {
       setBookingLoading(true);
       setBookingError('');
       setBookingSuccess('');
+      setBookingErrorType(null);
       
-      // Utiliser un nom différent pour éviter le conflit
+// Utiliser un nom différent pour éviter le conflit
       const newBooking = {
         userId: currentUser.id,
         prestationId: parseInt(id),
@@ -296,20 +299,33 @@ function PrestationDetail() {
       
       console.log('Envoi des données de réservation:', newBooking);
       
-      // Utiliser le controller avec le nouvel objet correctement nommé
+// Utiliser le controller avec le nouvel objet correctement nommé
       const result = await BookingController.createBooking(newBooking);
       
       console.log('Réservation créée avec succès:', result);
       setBookingSuccess('Votre réservation a été effectuée avec succès!');
       
-      // Réinitialiser le formulaire ou rediriger
       setTimeout(() => {
         navigate('/user/bookings');
       }, 2000);
       
     } catch (err) {
       console.error('Erreur lors de la réservation:', err);
-      setBookingError(err.response?.data?.error || 'Une erreur est survenue lors de la réservation. Veuillez réessayer.');
+      
+      // Déterminer le type d'erreur
+      if (err.response?.data?.code === 'BOOKING_DATE_CONFLICT') {
+        setBookingErrorType('DATE_CONFLICT');
+        setBookingError(
+          "Vous avez déjà une réservation pour cette prestation aux dates sélectionnées. " +
+          "Veuillez choisir d'autres dates."
+        );
+      } else if (err.response?.status === 404) {
+        setBookingErrorType('NOT_FOUND');
+        setBookingError("L'utilisateur ou la prestation n'a pas été trouvé. Veuillez vous reconnecter.");
+      } else {
+        setBookingErrorType('GENERAL');
+        setBookingError(err.response?.data?.error || 'Une erreur est survenue lors de la réservation. Veuillez réessayer.');
+      }
     } finally {
       setBookingLoading(false);
     }
@@ -366,9 +382,21 @@ function PrestationDetail() {
           </div>
           <div className="card-body">
             {bookingError && (
-              <div className="alert alert-danger">
-                <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
+              <div className={`alert ${bookingErrorType === 'DATE_CONFLICT' ? 'alert-warning' : 'alert-danger'}`}>
+                <FontAwesomeIcon 
+                  icon={bookingErrorType === 'DATE_CONFLICT' ? faCalendarXmark : faExclamationTriangle} 
+                  className="me-2" 
+                />
                 {bookingError}
+                
+                {bookingErrorType === 'DATE_CONFLICT' && (
+                  <div className="mt-2">
+                    <small>
+                      Conseil: Vérifiez vos réservations actuelles dans votre espace personnel ou 
+                      <Link to="/user/bookings" className="ms-1 text-decoration-underline">cliquez ici</Link>.
+                    </small>
+                  </div>
+                )}
               </div>
             )}
             
