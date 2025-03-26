@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faFilter, faSnowflake, faPersonHiking, faEye } from '@fortawesome/free-solid-svg-icons';
 // Importer le contrôleur
-import PrestationController from '../controllers/PrestationController';
+import PrestationController from '../../controllers/PrestationController';
+
 
 function PrestationsMain() {
   const [prestations, setPrestations] = useState([]);
