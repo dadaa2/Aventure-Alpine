@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../models');
-const { Prestation, Sport } = db;
+const db = require('../models'); // Importer tous les modèles
+const { Op } = require('sequelize');
+const { Prestation, Sport } = db; // Déstructurer les modèles dont vous avez besoin
 
 // Route pour récupérer toutes les sports
 router.get('/sports/all', async (req, res) => {
@@ -14,47 +15,83 @@ router.get('/sports/all', async (req, res) => {
   }
 });
 
-// Route pour récupérer toutes les prestations
+// Route GET avec pagination et filtres
 router.get('/', async (req, res) => {
   try {
-    const prestations = await Prestation.findAll({
-      include: [{ model: Sport, as: 'sport' }]
+    const {
+      page = 1,
+      limit = 9,
+      search = '',
+      sportId,
+      priceMin,
+      priceMax
+    } = req.query;
+    
+    console.log('Requête prestations avec paramètres:', {
+      page, limit, search, sportId, priceMin, priceMax
+    });
+
+    // Construction des conditions WHERE
+    const whereConditions = {};
+    
+    // Filtre par recherche (nom ou description)
+    if (search) {
+      whereConditions[Op.or] = [
+        { name: { [Op.like]: `%${search}%` } },
+        { description: { [Op.like]: `%${search}%` } }
+      ];
+    }
+    
+    // Filtre par sport avec conversion en nombre
+    if (sportId) {
+      whereConditions.sportId = parseInt(sportId, 10);
+    }
+    
+    // Filtre par prix avec conversion en nombre pour éviter les erreurs de type
+    if (priceMin !== undefined && priceMax !== undefined) {
+      whereConditions.price = { 
+        [Op.between]: [parseFloat(priceMin), parseFloat(priceMax)] 
+      };
+    } else if (priceMin !== undefined) {
+      whereConditions.price = { [Op.gte]: parseFloat(priceMin) };
+    } else if (priceMax !== undefined) {
+      whereConditions.price = { [Op.lte]: parseFloat(priceMax) };
+    }
+
+    // Avant d'exécuter la requête, log
+    console.log('Conditions de filtrage:', JSON.stringify(whereConditions));
+    
+    // Exécuter la requête avec pagination
+    const prestations = await Prestation.findAndCountAll({
+      where: whereConditions,
+      limit: parseInt(limit),
+      offset: (parseInt(page) - 1) * parseInt(limit),
+      include: [{
+        model: Sport,
+        as: 'sport',
+        attributes: ['id', 'name']
+      }],
+      order: [['createdAt', 'DESC']]
     });
     
-    // Pour chaque prestation, récupérer les détails du sport
-    const prestationsWithDetails = await Promise.all(prestations.map(async (prestation) => {
-      const prestationData = prestation.toJSON();
-      
-      // Ajouter une vérification que sport existe et a un nom
-      if (!prestationData.sport) {
-        prestationData.sportDetails = null;
-        return prestationData;
-      }
-      
-      const sportType = prestationData.sport.name.toLowerCase();
-      
-      let sportDetails = null;
-      if (sportType === 'ski') {
-        sportDetails = await db.Ski.findOne({ where: { prestationId: prestationData.id } });
-      } else if (sportType === 'randonnée') {
-        // Utiliser Randonne au lieu de Randonnee
-        sportDetails = await db.Randonne.findOne({ where: { prestationId: prestationData.id } });
-      } else if (sportType === 'escalade') {
-        sportDetails = await db.Escalade.findOne({ where: { prestationId: prestationData.id } });
-      }
-      
-      prestationData.sportDetails = sportDetails;
-      return prestationData;
-    }));
+    console.log(`Résultat de la requête: ${prestations.count} prestations trouvées`);
     
-    res.status(200).json(prestationsWithDetails);
+    // Si aucune prestation trouvée, log plus détaillé
+    if (prestations.count === 0) {
+      const allPrestations = await Prestation.count();
+      console.log(`Total des prestations en base: ${allPrestations}`);
+    }
+    
+    res.json({
+      rows: prestations.rows,
+      count: prestations.count
+    });
   } catch (error) {
-    console.error("Error fetching prestations:", error);
-    res.status(500).json({ error: "An error occurred while fetching prestations." });
+    console.error('Error fetching prestations:', error);
+    res.status(500).json({ error: 'Une erreur est survenue lors du chargement des prestations' });
   }
 });
 
-// Modifier la route GET pour récupérer une prestation par ID
 // Route GET pour récupérer une prestation par ID
 router.get('/:id', async (req, res) => {
   try {
@@ -69,7 +106,6 @@ router.get('/:id', async (req, res) => {
     // Convertir en objet JS pour pouvoir ajouter des propriétés
     const prestationData = prestation.toJSON();
     
-    // Ajouter une vérification que sport existe et a un nom
     if (!prestationData.sport) {
       prestationData.sportDetails = null;
       return res.status(200).json(prestationData);
@@ -86,14 +122,12 @@ router.get('/:id', async (req, res) => {
       .replace(/[\u0300-\u036f]/g, '');
       
     console.log('Sport type normalisé:', normalizedSportType);
-    console.log('Modèles disponibles:', Object.keys(db));
-
+    
     // Récupération des détails du sport en fonction de son type
     let sportDetails = null;
     if (normalizedSportType === 'ski' && db.Ski) {
       sportDetails = await db.Ski.findOne({ where: { prestationId: prestationData.id } });
     } else if ((normalizedSportType === 'randonnee' || normalizedSportType === 'randonne') && db.Randonne) {
-      // Utiliser le bon nom de modèle (Randonne au lieu de Randonnee)
       sportDetails = await db.Randonne.findOne({ where: { prestationId: prestationData.id } });
     } else if (normalizedSportType === 'escalade' && db.Escalade) {
       sportDetails = await db.Escalade.findOne({ where: { prestationId: prestationData.id } });

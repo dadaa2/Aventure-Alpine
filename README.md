@@ -4,19 +4,20 @@ Un site web nommée Aventure Alpine, une application web qui permettra de réser
 Réalisé avec React et Bootstrap ainsi qu'avec une base de donnée en MySQL.
 
 Faire npm start pour démarer l'application
-Avec la bibliothèque concurrently 
-Dans la console la partie bleu c'est le terminal du client, en rouge le terminal du serveur. 
+Avec la bibliothèque concurrently
+Dans la console la partie bleu c'est le terminal du client, en rouge le terminal du serveur.
 Sinon faire
 
 ```bash
-npm start 
+npm start
 ```
+
 dans le dossier client et server.
 
-
 Avec l'utilisation des bibliothèques notables comme :
+
 - Sequelize, un ORM (Objet Relational Mapping) qui permet de lier la base de donnée au code facilement.
-- express, un outil qui gère les API facilement 
+- express, un outil qui gère les API facilement
 - mysql2, elle permet de se connecter à la base de donnée qui est en MySQL
 - Faker, un générateur de données factices.
 - Axios, un outil qui permet de faire des requetes HTTP.
@@ -24,6 +25,7 @@ Avec l'utilisation des bibliothèques notables comme :
 - formil, pour la gestion automatiques des form
 - yup, pour vérifier la validation des entrés
 - UUID, pour des id uniques et automatique
+- react-select, pour des recherches dynamiques
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

@@ -65,6 +65,29 @@ class BookingController {
       throw error;
     }
   }
+
+  static async getUserBookings(userId) {
+    try {
+      console.log(`Récupération des réservations pour l'utilisateur ID: ${userId}`);
+      // Route vers l'API pour obtenir les réservations d'un utilisateur spécifique
+      const response = await axios.get(`${API_URL}/user/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user bookings:', error);
+      throw error;
+    }
+  }
+
+  // Ajouter cette méthode
+  static async cancelBooking(id) {
+    try {
+      const response = await axios.put(`${API_URL}/${id}/cancel`);
+      return response.data;
+    } catch (error) {
+      console.error('Error cancelling booking:', error);
+      throw error;
+    }
+  }
 }
 
 export default BookingController;

@@ -1,117 +1,127 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { format } from 'date-fns';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faSave, faCalendar, faUser, faPersonHiking, faStar } from '@fortawesome/free-solid-svg-icons';
+import { useParams, useNavigate } from 'react-router-dom';
 import BookingController from '../../../controllers/BookingController';
-import UserController from '../../../controllers/UserController';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSave, faArrowLeft, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import Select from 'react-select'; // Ajoutez cette importation
 
 function BookingEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
   
-  const [users, setUsers] = useState([]);
+  // Initialiser prestations comme un tableau vide
   const [prestations, setPrestations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  
-  const [formData, setFormData] = useState({
+  const [users, setUsers] = useState([]);
+  const [booking, setBooking] = useState({
     userId: '',
     prestationId: '',
     startPrestation: '',
     endPrestation: '',
     numberPerson: 1,
-    star: null,
-    commentary: ''
+    status: 'pending'
   });
+  
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  // Charger les données de la réservation et les listes déroulantes
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
       try {
-        // Charger la réservation
-        const bookingData = await BookingController.getBookingById(id);
+        setLoading(true);
+        setError('');
         
-        // Formater les dates pour l'affichage dans les champs de formulaire
-        const formattedData = {
-          ...bookingData,
-          startPrestation: bookingData.startPrestation ? format(new Date(bookingData.startPrestation), 'yyyy-MM-dd') : '',
-          endPrestation: bookingData.endPrestation ? format(new Date(bookingData.endPrestation), 'yyyy-MM-dd') : '',
-        };
+        // Récupérer les données de la réservation si ID est présent
+        if (id) {
+          const bookingData = await BookingController.getBookingById(id);
+          setBooking({
+            userId: bookingData.userId || '',
+            prestationId: bookingData.prestationId || '',
+            startPrestation: bookingData.startPrestation ? bookingData.startPrestation.split('T')[0] : '',
+            endPrestation: bookingData.endPrestation ? bookingData.endPrestation.split('T')[0] : '',
+            numberPerson: bookingData.numberPerson || 1,
+            status: bookingData.status || 'pending'
+          });
+        }
         
-        setFormData(formattedData);
-        
-        // Récupérer les utilisateurs
-        const usersData = await UserController.getUsers();
-        setUsers(usersData.rows || []);
-        
-        // Récupérer les prestations
+        // Récupérer la liste des prestations
         const prestationsResponse = await axios.get('http://localhost:3002/prestations');
-        setPrestations(prestationsResponse.data || []);
+        // Vérifier la structure de la réponse et s'assurer que nous avons un tableau
+        const prestationsData = Array.isArray(prestationsResponse.data) 
+          ? prestationsResponse.data 
+          : (prestationsResponse.data.rows || []);
+          
+        setPrestations(prestationsData);
+        
+        // Récupérer la liste des utilisateurs
+        const usersResponse = await axios.get('http://localhost:3002/users');
+        // Vérifier la structure de la réponse et s'assurer que nous avons un tableau
+        const usersData = Array.isArray(usersResponse.data) 
+          ? usersResponse.data 
+          : (usersResponse.data.rows || []);
+          
+        setUsers(usersData);
+        
       } catch (err) {
-        console.error('Error fetching booking data:', err);
+        console.error('Error fetching data:', err);
         setError(`Erreur lors du chargement des données: ${err.message}`);
       } finally {
         setLoading(false);
       }
     };
-
-    if (id) {
-      fetchData();
-    }
+    
+    fetchData();
   }, [id]);
   
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setBooking({
+      ...booking,
+      [e.target.name]: e.target.value
+    });
   };
-
-  const handleNumberChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: parseInt(value, 10) || null });
-  };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSaving(true);
-    setError('');
-    setSuccess('');
     
     try {
-      // Validation des champs obligatoires
-      if (!formData.userId || !formData.prestationId || !formData.startPrestation || !formData.endPrestation) {
-        setError('Veuillez remplir tous les champs obligatoires');
-        setSaving(false);
-        return;
+      setSubmitting(true);
+      setError('');
+      
+      if (id) {
+        await BookingController.updateBooking(id, booking);
+      } else {
+        await BookingController.createBooking(booking);
       }
       
-      // Vérification que la date de fin est après la date de début
-      if (formData.startPrestation >= formData.endPrestation) {
-        setError('La date de fin doit être après la date de début');
-        setSaving(false);
-        return;
-      }
+      navigate('/admin/bookings');
       
-      // Envoyer les données au serveur
-      await BookingController.updateBooking(id, formData);
-      setSuccess('Réservation mise à jour avec succès');
-      
-      // Rediriger vers la page de détail après un court délai
-      setTimeout(() => {
-        navigate(`/admin/bookings/${id}`);
-      }, 1500);
     } catch (err) {
-      console.error('Error updating booking:', err);
-      setError(`Erreur lors de la mise à jour: ${err.message}`);
+      console.error('Error saving booking:', err);
+      setError(`Erreur lors de l'enregistrement: ${err.message}`);
     } finally {
-      setSaving(false);
+      setSubmitting(false);
     }
   };
-
+  
+  // Options formatées pour react-select
+  const userOptions = Array.isArray(users) 
+    ? users.map(user => ({
+        value: user.id,
+        label: `${user.mail} ${user.firstName ? `(${user.firstName} ${user.lastName})` : ''}`
+      }))
+    : [];
+  
+  // Trouver l'option sélectionnée
+  const selectedUserOption = userOptions.find(option => option.value === booking.userId) || null;
+  
+  const handleUserChange = (selectedOption) => {
+    setBooking({
+      ...booking,
+      userId: selectedOption ? selectedOption.value : ''
+    });
+  };
+  
   if (loading) {
     return (
       <div className="container mt-5 text-center">
@@ -121,201 +131,133 @@ function BookingEdit() {
       </div>
     );
   }
-
+  
   return (
     <div className="container my-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="mb-0">Modifier la réservation</h2>
-        <div>
-          <Link to={`/admin/bookings/${id}`} className="btn btn-secondary me-2">
-            <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Annuler
-          </Link>
-        </div>
+        <h2>{id ? 'Modifier la réservation' : 'Nouvelle réservation'}</h2>
+        <button 
+          className="btn btn-secondary"
+          onClick={() => navigate('/admin/bookings')}
+        >
+          <FontAwesomeIcon icon={faArrowLeft} className="me-2" /> Retour
+        </button>
       </div>
       
-      <div className="card shadow-sm">
-        <div className="card-header bg-primary text-white">
-          <h3 className="card-title h5 mb-0">Formulaire de modification</h3>
+      {error && (
+        <div className="alert alert-danger mb-4">
+          <FontAwesomeIcon icon={faExclamationCircle} className="me-2" />
+          {error}
         </div>
+      )}
+      
+      <div className="card shadow-sm">
         <div className="card-body">
-          {error && (
-            <div className="alert alert-danger mb-4">{error}</div>
-          )}
-          
-          {success && (
-            <div className="alert alert-success mb-4">{success}</div>
-          )}
-          
           <form onSubmit={handleSubmit}>
-            <div className="row mb-4">
-              <div className="col-md-6">
-                {/* Sélection du client */}
-                <div className="mb-3">
-                  <label htmlFor="userId" className="form-label">Client <span className="text-danger">*</span></label>
-                  <div className="input-group">
-                    <span className="input-group-text">
-                      <FontAwesomeIcon icon={faUser} />
-                    </span>
-                    <select 
-                      id="userId"
-                      name="userId"
-                      className="form-select"
-                      value={formData.userId}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Sélectionnez un client...</option>
-                      {users.map(user => (
-                        <option key={user.id} value={user.id}>
-                          {user.firstName} {user.lastName} ({user.mail})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                
-                {/* Sélection de la prestation */}
-                <div className="mb-3">
-                  <label htmlFor="prestationId" className="form-label">Prestation <span className="text-danger">*</span></label>
-                  <div className="input-group">
-                    <span className="input-group-text">
-                      <FontAwesomeIcon icon={faPersonHiking} />
-                    </span>
-                    <select 
-                      id="prestationId"
-                      name="prestationId"
-                      className="form-select"
-                      value={formData.prestationId}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Sélectionnez une prestation...</option>
-                      {prestations.map(prestation => (
-                        <option key={prestation.id} value={prestation.id}>
-                          {prestation.name} ({prestation.price ? `${prestation.price} €` : 'Prix non défini'})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+            <div className="mb-3">
+              <label htmlFor="userId" className="form-label">Client</label>
+              <Select
+                id="userId"
+                name="userId"
+                value={selectedUserOption}
+                onChange={handleUserChange}
+                options={userOptions}
+                placeholder="Rechercher un client..."
+                noOptionsMessage={() => "Aucun client trouvé"}
+                isClearable
+                isSearchable
+                className="basic-single"
+                classNamePrefix="select"
+              />
+              {!booking.userId && <div className="text-danger mt-1">Veuillez sélectionner un client</div>}
+            </div>
+            
+            <div className="mb-3">
+              <label htmlFor="prestationId" className="form-label">Prestation</label>
+              <select 
+                id="prestationId"
+                name="prestationId"
+                className="form-select"
+                value={booking.prestationId}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Sélectionner une prestation</option>
+                {/* Vérifier que prestations est un tableau avant d'utiliser .map() */}
+                {Array.isArray(prestations) && prestations.map(prestation => (
+                  <option key={prestation.id} value={prestation.id}>
+                    {prestation.name} ({prestation.price} €)
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="row">
+              <div className="col-md-6 mb-3">
+                <label htmlFor="startPrestation" className="form-label">Date de début</label>
+                <input 
+                  type="date"
+                  id="startPrestation"
+                  name="startPrestation"
+                  className="form-control"
+                  value={booking.startPrestation}
+                  onChange={handleChange}
+                  required
+                />
               </div>
               
-              <div className="col-md-6">
-                {/* Date de début */}
-                <div className="mb-3">
-                  <label htmlFor="startPrestation" className="form-label">Date de début <span className="text-danger">*</span></label>
-                  <div className="input-group">
-                    <span className="input-group-text">
-                      <FontAwesomeIcon icon={faCalendar} />
-                    </span>
-                    <input 
-                      type="date" 
-                      className="form-control" 
-                      id="startPrestation"
-                      name="startPrestation"
-                      value={formData.startPrestation}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </div>
-                
-                {/* Date de fin */}
-                <div className="mb-3">
-                  <label htmlFor="endPrestation" className="form-label">Date de fin <span className="text-danger">*</span></label>
-                  <div className="input-group">
-                    <span className="input-group-text">
-                      <FontAwesomeIcon icon={faCalendar} />
-                    </span>
-                    <input 
-                      type="date" 
-                      className="form-control" 
-                      id="endPrestation"
-                      name="endPrestation"
-                      value={formData.endPrestation}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </div>
+              <div className="col-md-6 mb-3">
+                <label htmlFor="endPrestation" className="form-label">Date de fin</label>
+                <input 
+                  type="date"
+                  id="endPrestation"
+                  name="endPrestation"
+                  className="form-control"
+                  value={booking.endPrestation}
+                  onChange={handleChange}
+                  required
+                />
               </div>
             </div>
             
-            {/* Nombre de participants */}
             <div className="mb-3">
-              <label htmlFor="numberPerson" className="form-label">Nombre de participants <span className="text-danger">*</span></label>
+              <label htmlFor="numberPerson" className="form-label">Nombre de participants</label>
               <input 
-                type="number" 
-                className="form-control" 
+                type="number"
                 id="numberPerson"
                 name="numberPerson"
-                value={formData.numberPerson}
-                onChange={handleNumberChange}
+                className="form-control"
+                value={booking.numberPerson}
+                onChange={handleChange}
                 min="1"
                 required
               />
             </div>
-
-            {/* Évaluation */}
+            
             <div className="mb-3">
-              <label htmlFor="star" className="form-label">Évaluation (étoiles)</label>
-              <div className="input-group">
-                <span className="input-group-text">
-                  <FontAwesomeIcon icon={faStar} />
-                </span>
-                <select 
-                  id="star"
-                  name="star"
-                  className="form-select"
-                  value={formData.star !== null ? formData.star : ''}
-                  onChange={handleNumberChange}
-                >
-                  <option value="">Non évalué</option>
-                  <option value="1">1 - Très insatisfait</option>
-                  <option value="2">2 - Insatisfait</option>
-                  <option value="3">3 - Moyen</option>
-                  <option value="4">4 - Satisfait</option>
-                  <option value="5">5 - Très satisfait</option>
-                </select>
-              </div>
-            </div>
-            
-            {/* Commentaire (optionnel) */}
-            <div className="mb-4">
-              <label htmlFor="commentary" className="form-label">Commentaire</label>
-              <textarea 
-                className="form-control" 
-                id="commentary"
-                name="commentary"
-                value={formData.commentary || ''}
+              <label htmlFor="status" className="form-label">Statut</label>
+              <select 
+                id="status"
+                name="status"
+                className="form-select"
+                value={booking.status}
                 onChange={handleChange}
-                rows="3"
-                placeholder="Avis ou commentaire sur la prestation"
-              />
+              >
+                <option value="pending">En attente</option>
+                <option value="confirmed">Confirmé</option>
+                <option value="cancelled">Annulé</option>
+                <option value="completed">Terminé</option>
+              </select>
             </div>
             
-            <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-              <Link 
-                to={`/admin/bookings/${id}`}
-                className="btn btn-secondary me-md-2"
-              >
-                Annuler
-              </Link>
+            <div className="mt-4">
               <button 
                 type="submit" 
                 className="btn btn-primary"
-                disabled={saving}
+                disabled={submitting}
               >
-                {saving ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Enregistrement...
-                  </>
-                ) : (
-                  <>
-                    <FontAwesomeIcon icon={faSave} className="me-2" /> Mettre à jour
-                  </>
-                )}
+                <FontAwesomeIcon icon={faSave} className="me-2" />
+                {submitting ? 'Enregistrement...' : 'Enregistrer'}
               </button>
             </div>
           </form>

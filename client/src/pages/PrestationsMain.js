@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faFilter, faStar, faSnowflake, faPersonHiking, faEye } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faFilter, faSnowflake, faPersonHiking, faEye } from '@fortawesome/free-solid-svg-icons';
+// Importer le contrôleur
+import PrestationController from '../controllers/PrestationController';
 
 function PrestationsMain() {
   const [prestations, setPrestations] = useState([]);
@@ -23,31 +24,48 @@ function PrestationsMain() {
     const fetchPrestations = async () => {
       try {
         setLoading(true);
-        const params = {
-          page: currentPage,
-          limit: 9,
-          ...filters
-        };
+        setError('');
         
-        // Supprime les filtres vides
-        Object.keys(params).forEach(key => {
-          if (params[key] === '') delete params[key];
-        });
+        // Préparation des paramètres pour le contrôleur
+        const page = currentPage;
+        const limit = 9;
+        const searchTerm = filters.search || '';
         
-        const response = await axios.get('http://localhost:3002/prestations', { params });
+        // Construire l'objet de paramètres supplémentaires
+        const additionalParams = {};
+        if (filters.sportId) additionalParams.sportId = filters.sportId;
+        if (filters.priceMin) additionalParams.priceMin = filters.priceMin;
+        if (filters.priceMax) additionalParams.priceMax = filters.priceMax;
         
-        setPrestations(response.data.rows || response.data);
+        // Utiliser le contrôleur au lieu d'axios directement
+        console.log('Appel au contrôleur avec:', { page, limit, searchTerm, ...additionalParams });
         
-        if (response.data.count) {
-          setTotalCount(response.data.count);
-          setTotalPages(Math.ceil(response.data.count / 9));
-        } else {
-          setTotalCount(response.data.length);
-          setTotalPages(1);
+        // Appel au contrôleur avec tous les paramètres
+        const data = await PrestationController.getPrestations(page, limit, searchTerm, additionalParams);
+        
+        console.log('Données reçues du contrôleur:', data);
+        
+        // Traitement des données selon le format
+        if (data && typeof data === 'object') {
+          if (data.rows && Array.isArray(data.rows)) {
+            setPrestations(data.rows);
+            setTotalCount(data.count);
+            setTotalPages(Math.ceil(data.count / 9) || 1);
+          } else if (Array.isArray(data)) {
+            setPrestations(data);
+            setTotalCount(data.length);
+            setTotalPages(Math.ceil(data.length / 9) || 1);
+          } else {
+            console.warn('Format inattendu:', data);
+            setPrestations([]);
+            setTotalCount(0);
+            setTotalPages(1);
+          }
         }
       } catch (err) {
-        console.error('Erreur lors du chargement des prestations:', err);
+        console.error('Erreur récupération prestations:', err);
         setError('Une erreur est survenue lors du chargement des prestations. Veuillez réessayer.');
+        setPrestations([]);
       } finally {
         setLoading(false);
       }
@@ -55,8 +73,9 @@ function PrestationsMain() {
 
     const fetchSports = async () => {
       try {
-        const response = await axios.get('http://localhost:3002/sports');
-        setSports(response.data);
+        // Utiliser le contrôleur pour récupérer les sports
+        const sports = await PrestationController.getAllSports();
+        setSports(sports);
       } catch (err) {
         console.error('Erreur lors du chargement des sports:', err);
       }
