@@ -3,8 +3,9 @@
 Un site web nommée Aventure Alpine, une application web qui permettra de réserver des activités dans les montagnes comme le ski, la randonnée ou l'escalade.
 Réalisé avec React et Bootstrap ainsi qu'avec une base de donnée en MySQL.
 
+Le nom de la base de données MySQL est "aventure-alpine"
+Avec la bibliothèque concurrently situé au début de l'arborescence du projet.
 Faire npm start pour démarer l'application
-Avec la bibliothèque concurrently
 Dans la console la partie bleu c'est le terminal du client, en rouge le terminal du serveur.
 Sinon faire
 
@@ -26,6 +27,8 @@ Avec l'utilisation des bibliothèques notables comme :
 - yup, pour vérifier la validation des entrés
 - UUID, pour des id uniques et automatique
 - react-select, pour des recherches dynamiques
+- date-fns, pour les manipulations de dates
+- FontAwesome , une bibliothèque d'icone
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
