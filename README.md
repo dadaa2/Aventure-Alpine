@@ -5,8 +5,8 @@ Faire npm start dans le dossier contenant "client" et "server" pour démarer l'a
 ```bash
 npm start
 ```
+Console bleu = Client, Console rouge server.
 
-Console bleu = Client, Console rouge server
 Avec l'utilisation des bibliothèques notables comme :
 
 - Sequelize, ORM
