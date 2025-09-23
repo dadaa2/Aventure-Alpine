@@ -1,17 +1,12 @@
 # Aventure Alpine en React
 
-Un site web nommée Aventure Alpine, une application web qui permettra de réserver des activités dans les montagnes comme le ski, la randonnée ou l'escalade.
-Fait en REACT
-Avec la bibliothèque  situé au début de l'arborescence du projet.
-Faire npm start pour démarer l'application
-Console bleu = Client, Console rouge server
-
+Un site web nommée Aventure Alpine, une application web en REACT qui permettra de réserver des activités dans les montagnes comme le ski, la randonnée ou l'escalade.
+Faire npm start dans le dossier contenant "client" et "server" pour démarer l'application
 ```bash
 npm start
 ```
 
-dans le dossier client et server.
-
+Console bleu = Client, Console rouge server
 Avec l'utilisation des bibliothèques notables comme :
 
 - Sequelize, ORM
